@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package bluwal;
+
+message FactorChallenge {
+    string n = 1;
+}
+
+message FactorChallengeSubmission {
+    repeated string factors = 1;
+}
+
+message Challenge {
+    oneof challenge {
+        FactorChallenge factor_challenge = 1;
+    }
+
+    int32 characteristic = 2;
+    int32 delta = 3;
+}
+
+message Contest {
+    string id = 1;
+    string author = 2;
+    repeated int32 goal = 3;
+    repeated int32 threshold = 4;
+
+    repeated Challenge challenges = 5;
+
+    string reward = 6;
+}
+
+message ContestCreateRequest {
+    Contest contest = 1;
+}
+
+message ContestCreateResponse {
+    Contest contest = 1;
+}
+
+message ContestGetRequest {
+    string id = 1;
+    string author = 2;
+}
+
+message ContestGetResponse {
+    Contest contest = 1;
+}
+
+message ContestEnrollRequest {
+    string contest_id = 1;
+    repeated int32 initial = 2;
+}
+
+message ContestEnrollResponse {
+    string enrollment_id = 1;
+}
+
+message ChallengeSubmitRequest {
+    string contest_id = 1;
+    string enrollment_id = 2;
+
+    oneof submission {
+        FactorChallengeSubmission factor_challenge_submission = 3;
+    }
+}
+
+message ChallengeSubmitResponse {
+    int32 current_challenge = 1;
+    repeated int32 current_state = 2;
+}
+
+message CheckGoalRequest {
+    string contest_id = 1;
+    string enrollment_id = 2;
+}
+
+message CheckGoalResponse {
+    int32 current_challenge = 1;
+    repeated int32 current_state = 2;
+}
+
+message ClaimRewardRequest {
+    string contest_id = 1;
+    string enrollment_id = 2;
+}
+
+message ClaimRewardResponse {
+    string reward = 1;
+}

@@ -1,0 +1,10 @@
+services:
+  bluwal:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./vol/data:/data"
+    environment:
+      DB_PATH: /data/bluwal.db
