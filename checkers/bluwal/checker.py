@@ -14,7 +14,7 @@ from proto.bluwal.bluwal_pb2 import Contest, ChallengeSubmitRequest
 
 class Checker(BaseChecker):
     vulns: int = 1
-    timeout: int = 10
+    timeout: int = 15
     uses_attack_data: bool = True
 
     def __init__(self, *args, **kwargs):
@@ -64,7 +64,7 @@ class Checker(BaseChecker):
             seed=seed,
             author=author,
             reward=flag,
-            possible=lambda: False,
+            possible=lambda _: False,
             max_characteristic=80,
         )
         created_contest = self.c.create_contest(self.c.rotating_connection(), contest)
@@ -90,7 +90,7 @@ class Checker(BaseChecker):
                 seed=seed,
                 author=author,
                 reward=flag,
-                possible=lambda: False,
+                possible=lambda _: False,
                 max_characteristic=80,
             )
             self.assert_eq(
