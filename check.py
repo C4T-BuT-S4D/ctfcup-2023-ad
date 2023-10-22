@@ -29,7 +29,7 @@ HOST = os.getenv('HOST', default='127.0.0.1')
 OUT_LOCK = Lock()
 DISABLE_LOG = False
 
-DC_REQUIRED_OPTIONS = ['version', 'services']
+DC_REQUIRED_OPTIONS = ['services']
 DC_ALLOWED_OPTIONS = DC_REQUIRED_OPTIONS + ['volumes']
 
 CONTAINER_REQUIRED_OPTIONS = ['restart']
@@ -63,6 +63,12 @@ ALLOWED_CHECKER_PATTERNS = [
 FORBIDDEN_CHECKER_PATTERNS = [
     "requests"
 ]
+
+ALLOWED_YAML_FILES = [
+    "buf.yaml",
+    "buf.gen.yaml",
+]
+
 
 class ColorType(Enum):
     INFO = '\033[92m'
@@ -253,8 +259,8 @@ class Service(BaseValidator):
         cnt_threads = max(1, min(MAX_THREADS, RUNS // 10))
         self._log(f'starting {cnt_threads} checker threads')
         with ThreadPoolExecutor(
-                max_workers=cnt_threads,
-                thread_name_prefix='Executor',
+            max_workers=cnt_threads,
+            thread_name_prefix='Executor',
         ) as executor:
             for _ in executor.map(self._checker.run_all, range(1, RUNS + 1)):
                 pass
@@ -290,7 +296,10 @@ class StructureValidator(BaseValidator):
 
     def validate_file(self, f: Path):
         path = f.relative_to(BASE_DIR)
-        self._error(f.suffix != '.yaml', f'file {path} has .yaml extension')
+
+        if f.name not in ALLOWED_YAML_FILES:
+            self._error(f.suffix != '.yaml', f'file {path} has .yaml extension')
+
         self._error(f.name != '.gitkeep', f'{path} found, should be named .keep')
 
         if f.name == 'docker-compose.yml':
@@ -304,19 +313,20 @@ class StructureValidator(BaseValidator):
                 if self._error(opt in dc, f'required option {opt} not in {path}'):
                     return
 
-            if self._error(isinstance(dc['version'], str), f'version option in {path} is not string'):
-                return
+            if 'version' in dc:
+                if self._error(isinstance(dc['version'], str), f'version option in {path} is not string'):
+                    return
 
-            try:
-                dc_version = float(dc['version'])
-            except ValueError:
-                self._error(False, f'version option in {path} is not float')
-                return
+                try:
+                    dc_version = float(dc['version'])
+                except ValueError:
+                    self._error(False, f'version option in {path} is not float')
+                    return
 
-            self._error(
-                2.4 <= dc_version < 3,
-                f'invalid version in {path}, need >=2.4 and <3, got {dc_version}',
-            )
+                self._error(
+                    2.4 <= dc_version < 3,
+                    f'invalid version in {path}, need >=2.4 and <3 (or no version at all), got {dc_version}',
+                )
 
             for opt in dc:
                 self._error(
@@ -333,7 +343,8 @@ class StructureValidator(BaseValidator):
                 return
 
             for container, container_conf in dc['services'].items():
-                if self._error(isinstance(container_conf, dict), f'config in {path} for container {container} is not dict'):
+                if self._error(isinstance(container_conf, dict),
+                               f'config in {path} for container {container} is not dict'):
                     continue
 
                 for opt in CONTAINER_REQUIRED_OPTIONS:
@@ -342,7 +353,8 @@ class StructureValidator(BaseValidator):
                         f'required option {opt} not in {path} for container {container}',
                     )
 
-                self._error('restart' in container_conf and container_conf['restart'] == 'unless-stopped', f'restart option in {path} for container {container} must be equal to "unless-stopped"')
+                self._error('restart' in container_conf and container_conf['restart'] == 'unless-stopped',
+                            f'restart option in {path} for container {container} must be equal to "unless-stopped"')
 
                 for opt in container_conf:
                     self._error(
@@ -351,13 +363,13 @@ class StructureValidator(BaseValidator):
                     )
 
                 if self._error(
-                        'image' not in container_conf or 'build' not in container_conf,
-                        f'both image and build options in {path} for container {container}'):
+                    'image' not in container_conf or 'build' not in container_conf,
+                    f'both image and build options in {path} for container {container}'):
                     continue
 
                 if self._error(
-                        'image' in container_conf or 'build' in container_conf,
-                        f'both image and build options not in {path} for container {container}'):
+                    'image' in container_conf or 'build' in container_conf,
+                    f'both image and build options not in {path} for container {container}'):
                     continue
 
                 if 'image' in container_conf:
@@ -454,7 +466,16 @@ def get_services() -> List[Service]:
 
 
 def list_services(_args):
-    get_services()
+    services = get_services()
+    if outfile := 'GITHUB_OUTPUT':
+        data = {
+            'include': [
+                {'service': service.name}
+                for service in services
+            ],
+        }
+        with open(outfile, 'a') as f:
+            f.write(f'matrix={json.dumps(data)}')
 
 
 def start_services(_args):
