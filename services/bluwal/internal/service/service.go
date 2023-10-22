@@ -95,23 +95,25 @@ func (s *Service) ContestGet(_ context.Context, request *bwpb.ContestGetRequest)
 }
 
 func (s *Service) ContestEnroll(_ context.Context, request *bwpb.ContestEnrollRequest) (*bwpb.ContestEnrollResponse, error) {
-	if request.ContestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "contest id must be set")
+	if request.EnrollmentFilter == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter must be set")
 	}
-	if len(request.Initial) == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "initial must be set")
+	if request.EnrollmentFilter.ContestId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter.contest_id must be set")
+	}
+	if request.EnrollmentFilter.UserId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter.user_id must be set")
+	}
+	if len(request.EnrollmentFilter.CurrentState) == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter.current_state must be set")
 	}
 
-	contest, err := s.c.GetContest(request.ContestId)
+	contest, err := s.c.GetContest(request.EnrollmentFilter.ContestId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "getting contest: %v", err)
 	}
 
-	enrollment := &models.Enrollment{
-		ID:           uuid.NewString(),
-		ContestID:    request.ContestId,
-		CurrentState: convert.Int32ToInt(request.Initial),
-	}
+	enrollment := models.NewEnrollmentFromFilter(request.EnrollmentFilter)
 	if slices.Compare(contest.Goal, enrollment.CurrentState) <= 0 {
 		return nil, status.Errorf(codes.FailedPrecondition, "you are too good already")
 	}
@@ -124,19 +126,16 @@ func (s *Service) ContestEnroll(_ context.Context, request *bwpb.ContestEnrollRe
 	}
 
 	return &bwpb.ContestEnrollResponse{
-		EnrollmentId: enrollment.ID,
+		EnrollmentFilter: enrollment.ToFilter(),
 	}, nil
 }
 
 func (s *Service) ChallengeSubmit(_ context.Context, request *bwpb.ChallengeSubmitRequest) (*bwpb.ChallengeSubmitResponse, error) {
-	if request.EnrollmentId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "enrollment id must be set")
-	}
-	if request.ContestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "contest id must be set")
+	if request.EnrollmentFilter == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter must be set")
 	}
 
-	contest, err := s.c.GetContest(request.ContestId)
+	contest, err := s.c.GetContest(request.EnrollmentFilter.ContestId)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "getting contest: %v", err)
 	}
@@ -145,7 +144,8 @@ func (s *Service) ChallengeSubmit(_ context.Context, request *bwpb.ChallengeSubm
 		return nil, status.Errorf(codes.Internal, "marshalling contest: %v", err)
 	}
 
-	enrollment, err := s.c.GetEnrollment(request.ContestId, request.EnrollmentId)
+	enrollmentFilter := models.NewEnrollmentFromFilter(request.EnrollmentFilter)
+	enrollment, err := s.c.GetEnrollment(enrollmentFilter)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "getting enrollment: %v", err)
 	}
@@ -166,25 +166,22 @@ func (s *Service) ChallengeSubmit(_ context.Context, request *bwpb.ChallengeSubm
 
 	enrollment.CurrentChallenge++
 	enrollment.CurrentState[int(challenge.Characteristic)] += int(challenge.Delta)
-	if err := s.c.UpdateEnrollment(enrollment); err != nil {
+	if err := s.c.UpdateEnrollment(enrollmentFilter, enrollment); err != nil {
 		return nil, status.Errorf(codes.Internal, "updating enrollment: %v", err)
 	}
 
 	return &bwpb.ChallengeSubmitResponse{
+		EnrollmentFilter: enrollment.ToFilter(),
 		CurrentChallenge: int32(enrollment.CurrentChallenge),
-		CurrentState:     convert.IntToInt32(enrollment.CurrentState),
 	}, nil
 }
 
 func (s *Service) CheckGoal(_ context.Context, request *bwpb.CheckGoalRequest) (*bwpb.CheckGoalResponse, error) {
-	if request.EnrollmentId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "enrollment id must be set")
-	}
-	if request.ContestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "contest id must be set")
+	if request.EnrollmentFilter == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter must be set")
 	}
 
-	enrollment, err := s.c.GetEnrollment(request.ContestId, request.EnrollmentId)
+	enrollment, err := s.c.GetEnrollment(models.NewEnrollmentFromFilter(request.EnrollmentFilter))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "getting enrollment: %v", err)
 	}
@@ -196,23 +193,20 @@ func (s *Service) CheckGoal(_ context.Context, request *bwpb.CheckGoalRequest) (
 }
 
 func (s *Service) ClaimReward(_ context.Context, request *bwpb.ClaimRewardRequest) (*bwpb.ClaimRewardResponse, error) {
-	if request.EnrollmentId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "enrollment id must be set")
-	}
-	if request.ContestId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "contest id must be set")
+	if request.EnrollmentFilter == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "enrollment_filter must be set")
 	}
 
-	contest, err := s.c.GetContest(request.ContestId)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "getting contest: %v", err)
-	}
-
-	if err := s.c.CheckEnrollmentComplete(request.ContestId, request.EnrollmentId); err != nil {
+	if err := s.c.CheckEnrollmentComplete(models.NewEnrollmentFromFilter(request.EnrollmentFilter)); err != nil {
 		if errors.Is(err, controller.ErrEnrollmentNotComplete) {
 			return nil, status.Errorf(codes.FailedPrecondition, "enrollment not complete")
 		}
 		return nil, status.Errorf(codes.Internal, "enrollment not complete: %v", err)
+	}
+
+	contest, err := s.c.GetContest(request.EnrollmentFilter.ContestId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "getting contest: %v", err)
 	}
 
 	return &bwpb.ClaimRewardResponse{

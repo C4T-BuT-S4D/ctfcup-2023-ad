@@ -8,6 +8,7 @@ import (
 
 	"github.com/genjidb/genji"
 	"github.com/genjidb/genji/document"
+	"github.com/google/uuid"
 )
 
 var (
@@ -48,27 +49,44 @@ func (c *Controller) GetContest(id string) (*models.Contest, error) {
 }
 
 func (c *Controller) CreateEnrollment(enrollment *models.Enrollment) error {
+	enrollment.ID = uuid.NewString()
 	if err := c.db.Exec("INSERT INTO enrollments VALUES ?", enrollment); err != nil {
 		return fmt.Errorf("inserting into db: %w", err)
 	}
 	return nil
 }
 
-func (c *Controller) UpdateEnrollment(enrollment *models.Enrollment) error {
+func (c *Controller) UpdateEnrollment(filter, enrollment *models.Enrollment) error {
 	if err := c.db.Exec(
-		"UPDATE enrollments SET current_challenge = ?, current_state = ? WHERE id = ?",
+		`
+		UPDATE enrollments 
+		SET 
+			current_challenge = ?, 
+			current_state = ? 
+		WHERE 
+			user_id = ? AND 
+			contest_id = ? AND 
+			current_state = ?
+		`,
 		enrollment.CurrentChallenge,
 		enrollment.CurrentState,
-		enrollment.ID,
+		filter.UserID,
+		filter.ContestID,
+		filter.CurrentState,
 	); err != nil {
 		return fmt.Errorf("updating enrollment: %w", err)
 	}
 	return nil
 }
 
-func (c *Controller) GetEnrollment(contestID, id string) (*models.Enrollment, error) {
+func (c *Controller) GetEnrollment(filter *models.Enrollment) (*models.Enrollment, error) {
 	var enrollment models.Enrollment
-	doc, err := c.db.QueryDocument("SELECT * FROM enrollments WHERE id = ? AND contest_id = ?", id, contestID)
+	doc, err := c.db.QueryDocument(
+		"SELECT * FROM enrollments WHERE user_id = ? AND contest_id = ? AND current_state = ?",
+		filter.UserID,
+		filter.ContestID,
+		filter.CurrentState,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("querying enrollment: %w", err)
 	}
@@ -78,19 +96,20 @@ func (c *Controller) GetEnrollment(contestID, id string) (*models.Enrollment, er
 	return &enrollment, nil
 }
 
-func (c *Controller) CheckEnrollmentComplete(contestID, id string) error {
-	enrollment, err := c.GetEnrollment(contestID, id)
+func (c *Controller) CheckEnrollmentComplete(filter *models.Enrollment) error {
+	contest, err := c.GetContest(filter.ContestID)
 	if err != nil {
-		return fmt.Errorf("getting enrollment: %w", err)
+		return fmt.Errorf("getting contest: %w", err)
 	}
 
 	doc, err := c.db.QueryDocument(
-		"SELECT count(*) FROM contests WHERE id = ? AND goal <= ?",
-		contestID,
-		enrollment.CurrentState,
+		"SELECT count(*) FROM enrollments WHERE user_id = ? AND contest_id = ? AND current_state >= ?",
+		filter.UserID,
+		filter.ContestID,
+		contest.Goal,
 	)
 	if err != nil {
-		return fmt.Errorf("querying enrollment: %w", err)
+		return fmt.Errorf("querying enrollments: %w", err)
 	}
 
 	var cnt int
@@ -109,7 +128,6 @@ func (c *Controller) migrate() error {
 				id TEXT PRIMARY KEY,
 				author TEXT NOT NULL,
 				reward TEXT NOT NULL,
-				goal ARRAY,
 				...
 		)`,
 	); err != nil {
@@ -118,19 +136,18 @@ func (c *Controller) migrate() error {
 
 	if err := c.db.Exec(
 		`CREATE TABLE IF NOT EXISTS enrollments (
-				id TEXT PRIMARY KEY,
+				id TEXT PRIMARY KEY NOT NULL,
+				user_id TEXT NOT NULL,
 				contest_id TEXT NOT NULL,
+				current_state ARRAY NOT NULL,
 				...
-		)`,
+		);
+		
+		-- imagine if genji supported composite primary keys.
+		CREATE INDEX IF NOT EXISTS idx_enrollments_pk ON enrollments(user_id, contest_id, current_state);
+		`,
 	); err != nil {
 		return fmt.Errorf("creating enrollments table: %w", err)
-	}
-
-	if err := c.db.Exec("CREATE INDEX IF NOT EXISTS idx_contests_id_goal ON contests (id, goal)"); err != nil {
-		return fmt.Errorf("creating idx_contests_id_goal index: %w", err)
-	}
-	if err := c.db.Exec("CREATE INDEX IF NOT EXISTS idx_enrollments_id_contest_id ON enrollments (id, contest_id)"); err != nil {
-		return fmt.Errorf("creating idx_enrollments_id_contest_id index: %w", err)
 	}
 
 	return nil

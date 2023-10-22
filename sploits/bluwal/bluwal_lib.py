@@ -1,6 +1,7 @@
 import grpc
 from proto.bluwal.bluwal_pb2 import (
     Contest,
+    EnrollmentFilter,
     ContestGetRequest,
     ContestGetResponse,
     ContestEnrollRequest,
@@ -34,17 +35,17 @@ class SploitMachine:
         return resp.contest
 
     @staticmethod
-    def enroll(stub: BluwalServiceStub, contest_id: str, initial: list[int]) -> str:
+    def enroll(stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter) -> EnrollmentFilter:
         resp: ContestEnrollResponse = stub.ContestEnroll(
-            ContestEnrollRequest(contest_id=contest_id, initial=initial)
+            ContestEnrollRequest(enrollment_filter=enrollment_filter)
         )
-        return resp.enrollment_id
+        return resp.enrollment_filter
 
     @staticmethod
     def claim_reward(
-        stub: BluwalServiceStub, contest_id: str, enrollment_id: str
+        stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter
     ) -> str:
         resp: ClaimRewardResponse = stub.ClaimReward(
-            ClaimRewardRequest(contest_id=contest_id, enrollment_id=enrollment_id)
+            ClaimRewardRequest(enrollment_filter=enrollment_filter)
         )
         return resp.reward

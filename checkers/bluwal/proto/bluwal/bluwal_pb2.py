@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x62luwal/bluwal.proto\x12\x06\x62luwal\"\x1f\n\x0f\x46\x61\x63torChallenge\x12\x0c\n\x01n\x18\x01 \x01(\tR\x01n\"5\n\x19\x46\x61\x63torChallengeSubmission\x12\x18\n\x07\x66\x61\x63tors\x18\x01 \x03(\tR\x07\x66\x61\x63tors\"\x9c\x01\n\tChallenge\x12\x44\n\x10\x66\x61\x63tor_challenge\x18\x01 \x01(\x0b\x32\x17.bluwal.FactorChallengeH\x00R\x0f\x66\x61\x63torChallenge\x12&\n\x0e\x63haracteristic\x18\x02 \x01(\x05R\x0e\x63haracteristic\x12\x14\n\x05\x64\x65lta\x18\x03 \x01(\x05R\x05\x64\x65ltaB\x0b\n\tchallenge\"\xae\x01\n\x07\x43ontest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06\x61uthor\x18\x02 \x01(\tR\x06\x61uthor\x12\x12\n\x04goal\x18\x03 \x03(\x05R\x04goal\x12\x1c\n\tthreshold\x18\x04 \x03(\x05R\tthreshold\x12\x31\n\nchallenges\x18\x05 \x03(\x0b\x32\x11.bluwal.ChallengeR\nchallenges\x12\x16\n\x06reward\x18\x06 \x01(\tR\x06reward\"A\n\x14\x43ontestCreateRequest\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\"B\n\x15\x43ontestCreateResponse\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\";\n\x11\x43ontestGetRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06\x61uthor\x18\x02 \x01(\tR\x06\x61uthor\"?\n\x12\x43ontestGetResponse\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\"O\n\x14\x43ontestEnrollRequest\x12\x1d\n\ncontest_id\x18\x01 \x01(\tR\tcontestId\x12\x18\n\x07initial\x18\x02 \x03(\x05R\x07initial\"<\n\x15\x43ontestEnrollResponse\x12#\n\renrollment_id\x18\x01 \x01(\tR\x0c\x65nrollmentId\"\xcf\x01\n\x16\x43hallengeSubmitRequest\x12\x1d\n\ncontest_id\x18\x01 \x01(\tR\tcontestId\x12#\n\renrollment_id\x18\x02 \x01(\tR\x0c\x65nrollmentId\x12\x63\n\x1b\x66\x61\x63tor_challenge_submission\x18\x03 \x01(\x0b\x32!.bluwal.FactorChallengeSubmissionH\x00R\x19\x66\x61\x63torChallengeSubmissionB\x0c\n\nsubmission\"k\n\x17\x43hallengeSubmitResponse\x12+\n\x11\x63urrent_challenge\x18\x01 \x01(\x05R\x10\x63urrentChallenge\x12#\n\rcurrent_state\x18\x02 \x03(\x05R\x0c\x63urrentState\"V\n\x10\x43heckGoalRequest\x12\x1d\n\ncontest_id\x18\x01 \x01(\tR\tcontestId\x12#\n\renrollment_id\x18\x02 \x01(\tR\x0c\x65nrollmentId\"e\n\x11\x43heckGoalResponse\x12+\n\x11\x63urrent_challenge\x18\x01 \x01(\x05R\x10\x63urrentChallenge\x12#\n\rcurrent_state\x18\x02 \x03(\x05R\x0c\x63urrentState\"X\n\x12\x43laimRewardRequest\x12\x1d\n\ncontest_id\x18\x01 \x01(\tR\tcontestId\x12#\n\renrollment_id\x18\x02 \x01(\tR\x0c\x65nrollmentId\"-\n\x13\x43laimRewardResponse\x12\x16\n\x06reward\x18\x01 \x01(\tR\x06rewardBj\n\ncom.bluwalB\x0b\x42luwalProtoP\x01Z\x17\x62luwal/pkg/proto/bluwal\xa2\x02\x03\x42XX\xaa\x02\x06\x42luwal\xca\x02\x06\x42luwal\xe2\x02\x12\x42luwal\\GPBMetadata\xea\x02\x06\x42luwalb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x62luwal/bluwal.proto\x12\x06\x62luwal\"\x1f\n\x0f\x46\x61\x63torChallenge\x12\x0c\n\x01n\x18\x01 \x01(\tR\x01n\"5\n\x19\x46\x61\x63torChallengeSubmission\x12\x18\n\x07\x66\x61\x63tors\x18\x01 \x03(\tR\x07\x66\x61\x63tors\"\x9c\x01\n\tChallenge\x12\x44\n\x10\x66\x61\x63tor_challenge\x18\x01 \x01(\x0b\x32\x17.bluwal.FactorChallengeH\x00R\x0f\x66\x61\x63torChallenge\x12&\n\x0e\x63haracteristic\x18\x02 \x01(\x05R\x0e\x63haracteristic\x12\x14\n\x05\x64\x65lta\x18\x03 \x01(\x05R\x05\x64\x65ltaB\x0b\n\tchallenge\"\xae\x01\n\x07\x43ontest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06\x61uthor\x18\x02 \x01(\tR\x06\x61uthor\x12\x12\n\x04goal\x18\x03 \x03(\x05R\x04goal\x12\x1c\n\tthreshold\x18\x04 \x03(\x05R\tthreshold\x12\x31\n\nchallenges\x18\x05 \x03(\x0b\x32\x11.bluwal.ChallengeR\nchallenges\x12\x16\n\x06reward\x18\x06 \x01(\tR\x06reward\"o\n\x10\x45nrollmentFilter\x12\x1d\n\ncontest_id\x18\x01 \x01(\tR\tcontestId\x12\x17\n\x07user_id\x18\x02 \x01(\tR\x06userId\x12#\n\rcurrent_state\x18\x03 \x03(\x05R\x0c\x63urrentState\"A\n\x14\x43ontestCreateRequest\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\"B\n\x15\x43ontestCreateResponse\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\";\n\x11\x43ontestGetRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06\x61uthor\x18\x02 \x01(\tR\x06\x61uthor\"?\n\x12\x43ontestGetResponse\x12)\n\x07\x63ontest\x18\x01 \x01(\x0b\x32\x0f.bluwal.ContestR\x07\x63ontest\"]\n\x14\x43ontestEnrollRequest\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\"^\n\x15\x43ontestEnrollResponse\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\"\xd2\x01\n\x16\x43hallengeSubmitRequest\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\x12\x63\n\x1b\x66\x61\x63tor_challenge_submission\x18\x02 \x01(\x0b\x32!.bluwal.FactorChallengeSubmissionH\x00R\x19\x66\x61\x63torChallengeSubmissionB\x0c\n\nsubmission\"\x8d\x01\n\x17\x43hallengeSubmitResponse\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\x12+\n\x11\x63urrent_challenge\x18\x02 \x01(\x05R\x10\x63urrentChallenge\"Y\n\x10\x43heckGoalRequest\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\"e\n\x11\x43heckGoalResponse\x12+\n\x11\x63urrent_challenge\x18\x01 \x01(\x05R\x10\x63urrentChallenge\x12#\n\rcurrent_state\x18\x02 \x03(\x05R\x0c\x63urrentState\"[\n\x12\x43laimRewardRequest\x12\x45\n\x11\x65nrollment_filter\x18\x01 \x01(\x0b\x32\x18.bluwal.EnrollmentFilterR\x10\x65nrollmentFilter\"-\n\x13\x43laimRewardResponse\x12\x16\n\x06reward\x18\x01 \x01(\tR\x06rewardBj\n\ncom.bluwalB\x0b\x42luwalProtoP\x01Z\x17\x62luwal/pkg/proto/bluwal\xa2\x02\x03\x42XX\xaa\x02\x06\x42luwal\xca\x02\x06\x42luwal\xe2\x02\x12\x42luwal\\GPBMetadata\xea\x02\x06\x42luwalb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -29,28 +29,30 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CHALLENGE']._serialized_end=276
   _globals['_CONTEST']._serialized_start=279
   _globals['_CONTEST']._serialized_end=453
-  _globals['_CONTESTCREATEREQUEST']._serialized_start=455
-  _globals['_CONTESTCREATEREQUEST']._serialized_end=520
-  _globals['_CONTESTCREATERESPONSE']._serialized_start=522
-  _globals['_CONTESTCREATERESPONSE']._serialized_end=588
-  _globals['_CONTESTGETREQUEST']._serialized_start=590
-  _globals['_CONTESTGETREQUEST']._serialized_end=649
-  _globals['_CONTESTGETRESPONSE']._serialized_start=651
-  _globals['_CONTESTGETRESPONSE']._serialized_end=714
-  _globals['_CONTESTENROLLREQUEST']._serialized_start=716
-  _globals['_CONTESTENROLLREQUEST']._serialized_end=795
-  _globals['_CONTESTENROLLRESPONSE']._serialized_start=797
-  _globals['_CONTESTENROLLRESPONSE']._serialized_end=857
-  _globals['_CHALLENGESUBMITREQUEST']._serialized_start=860
-  _globals['_CHALLENGESUBMITREQUEST']._serialized_end=1067
-  _globals['_CHALLENGESUBMITRESPONSE']._serialized_start=1069
-  _globals['_CHALLENGESUBMITRESPONSE']._serialized_end=1176
-  _globals['_CHECKGOALREQUEST']._serialized_start=1178
-  _globals['_CHECKGOALREQUEST']._serialized_end=1264
-  _globals['_CHECKGOALRESPONSE']._serialized_start=1266
-  _globals['_CHECKGOALRESPONSE']._serialized_end=1367
-  _globals['_CLAIMREWARDREQUEST']._serialized_start=1369
-  _globals['_CLAIMREWARDREQUEST']._serialized_end=1457
-  _globals['_CLAIMREWARDRESPONSE']._serialized_start=1459
-  _globals['_CLAIMREWARDRESPONSE']._serialized_end=1504
+  _globals['_ENROLLMENTFILTER']._serialized_start=455
+  _globals['_ENROLLMENTFILTER']._serialized_end=566
+  _globals['_CONTESTCREATEREQUEST']._serialized_start=568
+  _globals['_CONTESTCREATEREQUEST']._serialized_end=633
+  _globals['_CONTESTCREATERESPONSE']._serialized_start=635
+  _globals['_CONTESTCREATERESPONSE']._serialized_end=701
+  _globals['_CONTESTGETREQUEST']._serialized_start=703
+  _globals['_CONTESTGETREQUEST']._serialized_end=762
+  _globals['_CONTESTGETRESPONSE']._serialized_start=764
+  _globals['_CONTESTGETRESPONSE']._serialized_end=827
+  _globals['_CONTESTENROLLREQUEST']._serialized_start=829
+  _globals['_CONTESTENROLLREQUEST']._serialized_end=922
+  _globals['_CONTESTENROLLRESPONSE']._serialized_start=924
+  _globals['_CONTESTENROLLRESPONSE']._serialized_end=1018
+  _globals['_CHALLENGESUBMITREQUEST']._serialized_start=1021
+  _globals['_CHALLENGESUBMITREQUEST']._serialized_end=1231
+  _globals['_CHALLENGESUBMITRESPONSE']._serialized_start=1234
+  _globals['_CHALLENGESUBMITRESPONSE']._serialized_end=1375
+  _globals['_CHECKGOALREQUEST']._serialized_start=1377
+  _globals['_CHECKGOALREQUEST']._serialized_end=1466
+  _globals['_CHECKGOALRESPONSE']._serialized_start=1468
+  _globals['_CHECKGOALRESPONSE']._serialized_end=1569
+  _globals['_CLAIMREWARDREQUEST']._serialized_start=1571
+  _globals['_CLAIMREWARDREQUEST']._serialized_end=1662
+  _globals['_CLAIMREWARDRESPONSE']._serialized_start=1664
+  _globals['_CLAIMREWARDRESPONSE']._serialized_end=1709
 # @@protoc_insertion_point(module_scope)

@@ -8,6 +8,7 @@ import grpc
 from contextlib import contextmanager
 from proto.bluwal.bluwal_pb2 import (
     Contest,
+    EnrollmentFilter,
     ContestCreateRequest,
     ContestCreateResponse,
     ContestGetRequest,
@@ -60,41 +61,42 @@ class CheckMachine:
         return resp.contest
 
     def enroll(
-        self, stub: BluwalServiceStub, contest_id: str, initial: list[int]
-    ) -> str:
+        self, stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter,
+    ) -> EnrollmentFilter:
         resp: ContestEnrollResponse = stub.ContestEnroll(
-            ContestEnrollRequest(contest_id=contest_id, initial=initial)
+            ContestEnrollRequest(enrollment_filter=enrollment_filter)
         )
-        self.c.assert_(self.is_uuid(resp.enrollment_id), "enrollment id is not uuid")
-        return resp.enrollment_id
+        self.c.assert_(resp.enrollment_filter is not None, "enrollment filter is empty")
+        self.c.assert_eq(enrollment_filter.user_id, resp.enrollment_filter.user_id, "bad user id")
+        self.c.assert_eq(enrollment_filter.contest_id, resp.enrollment_filter.contest_id, "bad contest id")
+        self.c.assert_eq(enrollment_filter.current_state, resp.enrollment_filter.current_state, "bad current state")
+        return resp.enrollment_filter
 
     @staticmethod
     def submit(
         stub: BluwalServiceStub,
-        contest_id: str,
-        enrollment_id: str,
+        enrollment_filter: EnrollmentFilter,
         request: ChallengeSubmitRequest,
-    ) -> (int, list[int]):
-        request.contest_id = contest_id
-        request.enrollment_id = enrollment_id
+    ) -> (int, EnrollmentFilter):
+        request.enrollment_filter.CopyFrom(enrollment_filter)
         resp: ChallengeSubmitResponse = stub.ChallengeSubmit(request)
-        return resp.current_challenge, list(resp.current_state)
+        return resp.current_challenge, resp.enrollment_filter
 
     @staticmethod
     def check_goal(
-        stub: BluwalServiceStub, contest_id: str, enrollment_id: str
+        stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter,
     ) -> (int, list[int]):
         resp: CheckGoalResponse = stub.CheckGoal(
-            CheckGoalRequest(contest_id=contest_id, enrollment_id=enrollment_id)
+            CheckGoalRequest(enrollment_filter=enrollment_filter)
         )
         return resp.current_challenge, list(resp.current_state)
 
     @staticmethod
     def claim_reward(
-        stub: BluwalServiceStub, contest_id: str, enrollment_id: str
+        stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter
     ) -> str:
         resp: ClaimRewardResponse = stub.ClaimReward(
-            ClaimRewardRequest(contest_id=contest_id, enrollment_id=enrollment_id)
+            ClaimRewardRequest(enrollment_filter=enrollment_filter)
         )
         return resp.reward
 

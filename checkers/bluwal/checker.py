@@ -9,7 +9,7 @@ import grpc
 from checklib import *
 
 from bluwal_lib import CheckMachine
-from proto.bluwal.bluwal_pb2 import Contest, ChallengeSubmitRequest
+from proto.bluwal.bluwal_pb2 import Contest, ChallengeSubmitRequest, EnrollmentFilter
 
 
 class Checker(BaseChecker):
@@ -124,14 +124,26 @@ class Checker(BaseChecker):
 
         contest_goal = list(contest.goal)
 
-        enrollment_id = self.c.enroll(
-            self.c.rotating_connection(), contest.id, initial_state
+        user_id = str(uuid.uuid4())
+
+        enrollment_filter = EnrollmentFilter(
+            contest_id=contest.id,
+            user_id=user_id,
+            current_state=initial_state.copy(),
         )
+        got_enrollment_filter = self.c.enroll(
+            self.c.rotating_connection(), enrollment_filter,
+        )
+        self.assert_eq(
+            enrollment_filter, got_enrollment_filter, "enrollment filter mismatch"
+        )
+
         expected_challenge = 0
         for challenge, answer in zip(contest.challenges, answers):
-            current_challenge, current_state = self.c.submit(
-                self.c.rotating_connection(), contest.id, enrollment_id, answer
+            current_challenge, new_enrollment_filter = self.c.submit(
+                self.c.rotating_connection(), enrollment_filter, answer
             )
+            new_enrollment_filter: EnrollmentFilter
 
             expected_challenge += 1
             initial_state[challenge.characteristic] += challenge.delta
@@ -139,11 +151,13 @@ class Checker(BaseChecker):
             self.assert_eq(
                 current_challenge, expected_challenge, "wrong challenge", status=status
             )
-            self.assert_eq(current_state, initial_state, "wrong state", status=status)
+            self.assert_eq(new_enrollment_filter.current_state, initial_state, "wrong state", status=status)
+
+            enrollment_filter = new_enrollment_filter
 
             if random.randint(0, 1):
                 current_challenge, current_state = self.c.check_goal(
-                    self.c.rotating_connection(), contest.id, enrollment_id
+                    self.c.rotating_connection(), enrollment_filter
                 )
                 self.assert_eq(
                     current_challenge,
@@ -155,10 +169,10 @@ class Checker(BaseChecker):
                     current_state, initial_state, "wrong state", status=status
                 )
 
-            if current_state < contest_goal and random.randint(0, 1):
+            if list(enrollment_filter.current_state) < contest_goal and random.randint(0, 1):
                 try:
                     self.c.claim_reward(
-                        self.c.rotating_connection(), contest.id, enrollment_id
+                        self.c.rotating_connection(), enrollment_filter
                     )
                 except grpc.RpcError as e:
                     if e.code() == grpc.StatusCode.FAILED_PRECONDITION:
@@ -169,7 +183,7 @@ class Checker(BaseChecker):
                     self.cquit(Status.CORRUPT, "reward claimed too soon")
 
         final_challenge, final_state = self.c.check_goal(
-            self.c.rotating_connection(), contest.id, enrollment_id
+            self.c.rotating_connection(), enrollment_filter
         )
         self.assert_eq(
             final_challenge, len(contest.challenges), "wrong challenge", status=status
@@ -177,7 +191,7 @@ class Checker(BaseChecker):
         self.assert_gte(final_state, contest_goal, "wrong state", status=status)
 
         reward = self.c.claim_reward(
-            self.c.rotating_connection(), contest.id, enrollment_id
+            self.c.rotating_connection(), enrollment_filter
         )
         self.assert_eq(reward, contest.reward, "wrong reward", status=status)
 

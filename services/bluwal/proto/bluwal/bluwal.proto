@@ -30,6 +30,12 @@ message Contest {
     string reward = 6;
 }
 
+message EnrollmentFilter {
+    string contest_id = 1;
+    string user_id = 2;
+    repeated int32 current_state = 3;
+}
+
 message ContestCreateRequest {
     Contest contest = 1;
 }
@@ -48,31 +54,28 @@ message ContestGetResponse {
 }
 
 message ContestEnrollRequest {
-    string contest_id = 1;
-    repeated int32 initial = 2;
+    EnrollmentFilter enrollment_filter = 1;
 }
 
 message ContestEnrollResponse {
-    string enrollment_id = 1;
+    EnrollmentFilter enrollment_filter = 1;
 }
 
 message ChallengeSubmitRequest {
-    string contest_id = 1;
-    string enrollment_id = 2;
+    EnrollmentFilter enrollment_filter = 1;
 
     oneof submission {
-        FactorChallengeSubmission factor_challenge_submission = 3;
+        FactorChallengeSubmission factor_challenge_submission = 2;
     }
 }
 
 message ChallengeSubmitResponse {
-    int32 current_challenge = 1;
-    repeated int32 current_state = 2;
+    EnrollmentFilter enrollment_filter = 1;
+    int32 current_challenge = 2;
 }
 
 message CheckGoalRequest {
-    string contest_id = 1;
-    string enrollment_id = 2;
+    EnrollmentFilter enrollment_filter = 1;
 }
 
 message CheckGoalResponse {
@@ -81,8 +84,7 @@ message CheckGoalResponse {
 }
 
 message ClaimRewardRequest {
-    string contest_id = 1;
-    string enrollment_id = 2;
+    EnrollmentFilter enrollment_filter = 1;
 }
 
 message ClaimRewardResponse {
