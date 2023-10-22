@@ -5,11 +5,19 @@ managed:
     default: bluwal/pkg/proto
 plugins:
   # Go
-  - name: go
+  - plugin: buf.build/protocolbuffers/go:v1.31.0
     out: ../pkg/proto
     opt:
       - paths=source_relative
-  - name: go-grpc
+  - plugin: buf.build/grpc/go:v1.3.0
     out: ../pkg/proto
     opt:
       - paths=source_relative
+
+  # Python
+  - plugin: buf.build/grpc/python:v1.59.1
+    out: ./python
+  - plugin: buf.build/protocolbuffers/python
+    out: ./python
+  - plugin: buf.build/protocolbuffers/pyi:v24.4
+    out: ./python

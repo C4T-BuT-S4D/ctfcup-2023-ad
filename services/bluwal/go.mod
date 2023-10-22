@@ -5,6 +5,9 @@ go 1.21
 require (
 	github.com/genjidb/genji v0.15.2
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.3.1
+	github.com/samber/lo v1.38.1
+	github.com/sirupsen/logrus v1.9.3
 	github.com/titanous/json5 v1.0.0
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.28.1
@@ -22,7 +25,6 @@ require (
 	github.com/getsentry/sentry-go v0.17.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.3.1 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -34,7 +36,6 @@ require (
 	github.com/prometheus/common v0.39.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.5.0 // indirect

@@ -3,25 +3,26 @@ package models
 import (
 	"fmt"
 
+	"bluwal/internal/convert"
 	bwpb "bluwal/pkg/proto/bluwal"
 
 	"github.com/golang/protobuf/proto"
 )
 
 type Contest struct {
-	ID     string
-	Author string
+	ID     string `genji:"id"`
+	Author string `genji:"author"`
 
-	Goal      []int32
-	Threshold []int32
+	Goal      []int `genji:"goal"`
+	Threshold []int `genji:"threshold"`
 
-	Challenges [][]byte
+	Challenges [][]byte `genji:"challenges"`
 
-	Reward string
+	Reward string `genji:"reward"`
 }
 
 func NewContestFromProto(p *bwpb.Contest) (*Contest, error) {
-	challenges := make([][]byte, len(p.Challenges))
+	challenges := make([][]byte, 0, len(p.Challenges))
 	for i, c := range p.Challenges {
 		raw, err := proto.Marshal(c)
 		if err != nil {
@@ -33,8 +34,8 @@ func NewContestFromProto(p *bwpb.Contest) (*Contest, error) {
 	return &Contest{
 		ID:         p.Id,
 		Author:     p.Author,
-		Goal:       p.Goal,
-		Threshold:  p.Threshold,
+		Goal:       convert.Int32ToInt(p.Goal),
+		Threshold:  convert.Int32ToInt(p.Threshold),
 		Challenges: challenges,
 		Reward:     p.Reward,
 	}, nil
@@ -53,8 +54,8 @@ func (c *Contest) ToProto() (*bwpb.Contest, error) {
 	return &bwpb.Contest{
 		Id:         c.ID,
 		Author:     c.Author,
-		Goal:       c.Goal,
-		Threshold:  c.Threshold,
+		Goal:       convert.IntToInt32(c.Goal),
+		Threshold:  convert.IntToInt32(c.Threshold),
 		Challenges: challenges,
 		Reward:     c.Reward,
 	}, nil

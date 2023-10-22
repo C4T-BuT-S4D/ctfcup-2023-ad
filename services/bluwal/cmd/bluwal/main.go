@@ -28,7 +28,11 @@ func main() {
 		logrus.Fatalf("opening db: %v", err)
 	}
 
-	bc := controller.NewController(db)
+	bc, err := controller.NewController(db)
+	if err != nil {
+		logrus.Fatalf("creating controller: %v", err)
+	}
+
 	bs := service.NewService(bc)
 
 	server := grpc.NewServer()
@@ -40,8 +44,8 @@ func main() {
 	defer runCancel()
 
 	go func() {
-		logrus.Infof("starting server on :8080")
-		lis, err := net.Listen("tcp", ":8080")
+		logrus.Infof("starting server on :9090")
+		lis, err := net.Listen("tcp", ":9090")
 		if err != nil {
 			logrus.Fatalf("listening: %v", err)
 		}

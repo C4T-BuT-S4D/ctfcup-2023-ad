@@ -7,9 +7,9 @@ import (
 )
 
 func Check(challenge *bwpb.Challenge, submission *bwpb.ChallengeSubmitRequest) error {
-	switch challenge.Challenge.(type) {
+	switch c := challenge.Challenge.(type) {
 	case *bwpb.Challenge_FactorChallenge:
-		return checkFactorChallenge(challenge.GetFactorChallenge(), submission.GetFactorChallengeSubmission())
+		return checkFactorChallenge(c.FactorChallenge, submission.GetFactorChallengeSubmission())
 	default:
 		return fmt.Errorf("unknown challenge type: %T", challenge.Challenge)
 	}

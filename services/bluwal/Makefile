@@ -23,3 +23,13 @@ validate: lint test
 .PHONY: proto
 proto:
 	cd proto && buf generate
+	fastmod --accept-all 'from bluwal import' 'from proto.bluwal import' --dir proto/python --iglob '*.py'
+
+.PHONY: repo-proto-not-for-participants
+repo-proto-not-for-participants: proto
+	rm -rf ../../checkers/bluwal/proto
+	cp -r proto/python ../../checkers/bluwal/proto
+
+	@echo "Yeah, we even have sploit(s) for this service!"
+	rm -rf ../../sploits/bluwal/proto
+	cp -r proto/python ../../sploits/bluwal/proto

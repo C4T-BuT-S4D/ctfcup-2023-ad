@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"slices"
 
 	"bluwal/internal/challenges"
 	"bluwal/internal/controller"
+	"bluwal/internal/convert"
 	"bluwal/internal/models"
 	bwpb "bluwal/pkg/proto/bluwal"
 
@@ -73,9 +75,6 @@ func (s *Service) ContestGet(_ context.Context, request *bwpb.ContestGetRequest)
 	if request.Id == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "id must be set")
 	}
-	if request.Author == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "author must be set")
-	}
 
 	contest, err := s.c.GetContest(request.Id)
 	if err != nil {
@@ -83,7 +82,7 @@ func (s *Service) ContestGet(_ context.Context, request *bwpb.ContestGetRequest)
 	}
 
 	if contest.Author != request.Author {
-		return nil, status.Errorf(codes.PermissionDenied, "contest author mismatch")
+		contest.Reward = ""
 	}
 
 	res, err := contest.ToProto()
@@ -108,14 +107,18 @@ func (s *Service) ContestEnroll(_ context.Context, request *bwpb.ContestEnrollRe
 		return nil, status.Errorf(codes.Internal, "getting contest: %v", err)
 	}
 
-	if slices.Compare(contest.Threshold, request.Initial) > 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "you are too good already")
+	enrollment := &models.Enrollment{
+		ID:           uuid.NewString(),
+		ContestID:    request.ContestId,
+		CurrentState: convert.Int32ToInt(request.Initial),
+	}
+	if slices.Compare(contest.Goal, enrollment.CurrentState) <= 0 {
+		return nil, status.Errorf(codes.FailedPrecondition, "you are too good already")
+	}
+	if slices.Compare(contest.Threshold, enrollment.CurrentState) > 0 {
+		return nil, status.Errorf(codes.FailedPrecondition, "lol, noob")
 	}
 
-	enrollment := &models.Enrollment{
-		ID:        uuid.NewString(),
-		ContestID: request.ContestId,
-	}
 	if err := s.c.CreateEnrollment(enrollment); err != nil {
 		return nil, status.Errorf(codes.Internal, "creating enrollment: %v", err)
 	}
@@ -162,14 +165,14 @@ func (s *Service) ChallengeSubmit(_ context.Context, request *bwpb.ChallengeSubm
 	}
 
 	enrollment.CurrentChallenge++
-	enrollment.CurrentState[int(challenge.Characteristic)] += challenge.Delta
+	enrollment.CurrentState[int(challenge.Characteristic)] += int(challenge.Delta)
 	if err := s.c.UpdateEnrollment(enrollment); err != nil {
 		return nil, status.Errorf(codes.Internal, "updating enrollment: %v", err)
 	}
 
 	return &bwpb.ChallengeSubmitResponse{
 		CurrentChallenge: int32(enrollment.CurrentChallenge),
-		CurrentState:     enrollment.CurrentState,
+		CurrentState:     convert.IntToInt32(enrollment.CurrentState),
 	}, nil
 }
 
@@ -188,7 +191,7 @@ func (s *Service) CheckGoal(_ context.Context, request *bwpb.CheckGoalRequest) (
 
 	return &bwpb.CheckGoalResponse{
 		CurrentChallenge: int32(enrollment.CurrentChallenge),
-		CurrentState:     enrollment.CurrentState,
+		CurrentState:     convert.IntToInt32(enrollment.CurrentState),
 	}, nil
 }
 
@@ -206,7 +209,10 @@ func (s *Service) ClaimReward(_ context.Context, request *bwpb.ClaimRewardReques
 	}
 
 	if err := s.c.CheckEnrollmentComplete(request.ContestId, request.EnrollmentId); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "enrollment not complete: %v", err)
+		if errors.Is(err, controller.ErrEnrollmentNotComplete) {
+			return nil, status.Errorf(codes.FailedPrecondition, "enrollment not complete")
+		}
+		return nil, status.Errorf(codes.Internal, "enrollment not complete: %v", err)
 	}
 
 	return &bwpb.ClaimRewardResponse{
