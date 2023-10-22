@@ -132,7 +132,8 @@ class Checker(BaseChecker):
             current_state=initial_state.copy(),
         )
         got_enrollment_filter = self.c.enroll(
-            self.c.rotating_connection(), enrollment_filter,
+            self.c.rotating_connection(),
+            enrollment_filter,
         )
         self.assert_eq(
             enrollment_filter, got_enrollment_filter, "enrollment filter mismatch"
@@ -151,7 +152,12 @@ class Checker(BaseChecker):
             self.assert_eq(
                 current_challenge, expected_challenge, "wrong challenge", status=status
             )
-            self.assert_eq(new_enrollment_filter.current_state, initial_state, "wrong state", status=status)
+            self.assert_eq(
+                new_enrollment_filter.current_state,
+                initial_state,
+                "wrong state",
+                status=status,
+            )
 
             enrollment_filter = new_enrollment_filter
 
@@ -169,11 +175,11 @@ class Checker(BaseChecker):
                     current_state, initial_state, "wrong state", status=status
                 )
 
-            if list(enrollment_filter.current_state) < contest_goal and random.randint(0, 1):
+            if list(enrollment_filter.current_state) < contest_goal and random.randint(
+                0, 1
+            ):
                 try:
-                    self.c.claim_reward(
-                        self.c.rotating_connection(), enrollment_filter
-                    )
+                    self.c.claim_reward(self.c.rotating_connection(), enrollment_filter)
                 except grpc.RpcError as e:
                     if e.code() == grpc.StatusCode.FAILED_PRECONDITION:
                         pass
@@ -190,9 +196,7 @@ class Checker(BaseChecker):
         )
         self.assert_gte(final_state, contest_goal, "wrong state", status=status)
 
-        reward = self.c.claim_reward(
-            self.c.rotating_connection(), enrollment_filter
-        )
+        reward = self.c.claim_reward(self.c.rotating_connection(), enrollment_filter)
         self.assert_eq(reward, contest.reward, "wrong reward", status=status)
 
 

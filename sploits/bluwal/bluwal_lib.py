@@ -35,7 +35,9 @@ class SploitMachine:
         return resp.contest
 
     @staticmethod
-    def enroll(stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter) -> EnrollmentFilter:
+    def enroll(
+        stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter
+    ) -> EnrollmentFilter:
         resp: ContestEnrollResponse = stub.ContestEnroll(
             ContestEnrollRequest(enrollment_filter=enrollment_filter)
         )

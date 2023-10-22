@@ -61,15 +61,27 @@ class CheckMachine:
         return resp.contest
 
     def enroll(
-        self, stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter,
+        self,
+        stub: BluwalServiceStub,
+        enrollment_filter: EnrollmentFilter,
     ) -> EnrollmentFilter:
         resp: ContestEnrollResponse = stub.ContestEnroll(
             ContestEnrollRequest(enrollment_filter=enrollment_filter)
         )
         self.c.assert_(resp.enrollment_filter is not None, "enrollment filter is empty")
-        self.c.assert_eq(enrollment_filter.user_id, resp.enrollment_filter.user_id, "bad user id")
-        self.c.assert_eq(enrollment_filter.contest_id, resp.enrollment_filter.contest_id, "bad contest id")
-        self.c.assert_eq(enrollment_filter.current_state, resp.enrollment_filter.current_state, "bad current state")
+        self.c.assert_eq(
+            enrollment_filter.user_id, resp.enrollment_filter.user_id, "bad user id"
+        )
+        self.c.assert_eq(
+            enrollment_filter.contest_id,
+            resp.enrollment_filter.contest_id,
+            "bad contest id",
+        )
+        self.c.assert_eq(
+            enrollment_filter.current_state,
+            resp.enrollment_filter.current_state,
+            "bad current state",
+        )
         return resp.enrollment_filter
 
     @staticmethod
@@ -84,7 +96,8 @@ class CheckMachine:
 
     @staticmethod
     def check_goal(
-        stub: BluwalServiceStub, enrollment_filter: EnrollmentFilter,
+        stub: BluwalServiceStub,
+        enrollment_filter: EnrollmentFilter,
     ) -> (int, list[int]):
         resp: CheckGoalResponse = stub.CheckGoal(
             CheckGoalRequest(enrollment_filter=enrollment_filter)

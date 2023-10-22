@@ -24,7 +24,10 @@ def attack(host: str, contest_id: str):
 
     user_id = str(uuid.uuid4())
     initial = list(contest.threshold) + [0] * (128 - len(contest.threshold))
-    enrollment_filter = sm.enroll(stub, EnrollmentFilter(user_id=user_id, contest_id=contest_id, current_state=initial))
+    enrollment_filter = sm.enroll(
+        stub,
+        EnrollmentFilter(user_id=user_id, contest_id=contest_id, current_state=initial),
+    )
 
     reward = sm.claim_reward(stub, enrollment_filter)
     print(reward)
