@@ -1,3 +1,4 @@
 checklib
 grpcio
 pycryptodome
+protobuf
