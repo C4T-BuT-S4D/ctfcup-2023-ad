@@ -12,7 +12,7 @@ Development workflow:
 6) Down your service with `SERVICE=$SERVICE ./check.py down`.
 7) Push your code and create pull request to master branch.
 
-Don't forget to:[bluwal_lib.py](checkers%2Fbluwal%2Fbluwal_lib.py)
+Don't forget to:
 1) Add your checker requirements to `checkers/requirements.txt`.
-2) Use `dedcleaner` container to del[bluwal_lib.py](checkers%2Fbluwal%2Fbluwal_lib.py)ete old files if needed. Example can be found in `services/example/docker-compose.yml`.
+2) Use `dedcleaner` container to delete old files if needed. Example can be found in `services/example/docker-compose.yml`.
 3) Add info about your checker to `Checker` class. Example can be found in `checkers/example/checker.py`, line 11.
