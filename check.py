@@ -467,7 +467,7 @@ def get_services() -> List[Service]:
 
 def list_services(_args):
     services = get_services()
-    if outfile := 'GITHUB_OUTPUT':
+    if outfile := os.getenv('GITHUB_OUTPUT'):
         data = {
             'include': [
                 {'service': service.name}
