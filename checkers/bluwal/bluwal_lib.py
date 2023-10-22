@@ -176,7 +176,7 @@ class CheckMachine:
                 )
 
             elif challenge_type == "fermat":
-                factor1 = self.safe_get_prime(rnd, 1024)
+                factor1 = self.safe_get_prime(rnd, 512)
                 factor2 = self.next_prime(self.next_prime(factor1))
                 n = factor1 * factor2
                 return (
@@ -192,7 +192,7 @@ class CheckMachine:
                     ),
                 )
         else:
-            p, q = self.safe_get_prime(rnd, 1024), self.safe_get_prime(rnd, 1024)
+            p, q = self.safe_get_prime(rnd, 512), self.safe_get_prime(rnd, 512)
             n = p * q
             return (
                 Challenge(
