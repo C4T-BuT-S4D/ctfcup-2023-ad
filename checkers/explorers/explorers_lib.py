@@ -1,3 +1,5 @@
+from typing import Optional
+
 import checklib
 from checklib import BaseChecker
 import requests
@@ -44,7 +46,7 @@ class ExplorersLib:
         self.c.assert_eq(type(resp_json), dict, 'Failed to create route: invalid JSON')
         return resp_json
 
-    def get_route(self, session: requests.Session, route_id: str, token: str | None = None,
+    def get_route(self, session: requests.Session, route_id: str, token: Optional[str] = None,
                   status: checklib.Status = checklib.Status.MUMBLE):
         params = {}
         if token:
