@@ -3,15 +3,17 @@ package main
 import (
 	"context"
 	"errors"
-	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"bluwal/internal/controller"
+	"bluwal/internal/logging"
 	"bluwal/internal/service"
 	bwpb "bluwal/pkg/proto/bluwal"
 
+	mu "github.com/c4t-but-s4d/cbs-go/multiproto"
 	"github.com/genjidb/genji"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -19,6 +21,8 @@ import (
 )
 
 func main() {
+	logging.Init()
+
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
 		dbPath = "bluwal.db"
@@ -40,21 +44,30 @@ func main() {
 
 	bwpb.RegisterBluwalServiceServer(server, bs)
 
+	handler := mu.NewHandler(server)
+	httpServer := &http.Server{
+		Handler: handler,
+		Addr:    ":9090",
+	}
+
 	runCtx, runCancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer runCancel()
 
 	go func() {
-		logrus.Infof("starting server on :9090")
-		lis, err := net.Listen("tcp", ":9090")
-		if err != nil {
-			logrus.Fatalf("listening: %v", err)
-		}
-		if err := server.Serve(lis); err != nil && !errors.Is(err, grpc.ErrServerStopped) {
-			logrus.Fatalf("serving: %v", err)
+		logrus.Infof("starting server on %s", httpServer.Addr)
+		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logrus.Fatalf("error running http server: %v", err)
 		}
 	}()
 
 	<-runCtx.Done()
-	logrus.Infof("shutting down")
-	server.GracefulStop()
+	logrus.Info("shutting down")
+
+	shutdownCtx, shutdownCancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer shutdownCancel()
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		logrus.Fatalf("error stopping http server: %v", err)
+	}
+
+	logrus.Info("finished")
 }
