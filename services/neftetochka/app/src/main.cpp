@@ -1,0 +1,593 @@
+#include "crow/crow_all.h"
+#include <pqxx/pqxx>
+#include <asio.hpp>
+#include <grpcpp/grpcpp.h>
+
+#include <queue>
+#include <set>
+#include <cmath>
+
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+
+#include "station_client.h"
+
+#include "station.hpp"
+
+using google::protobuf::RepeatedField;
+using grpc::Server;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+using namespace std;
+
+pqxx::connection connection(std::getenv("PG_CONNECTION"));
+map<int, vector<int>> stations;
+map<int, pair<int, int>> port_coords;
+map<int, int> pid_port;
+
+void startStation(int port, int x, int y) {
+    pid_t child_pid;
+    string exe = "/app/stations/" + to_string(port);
+    
+    system(("cp /app/station " + exe).c_str());
+
+    child_pid = fork();
+    if (child_pid == 0) {
+        char *argv[] = {(char*)exe.c_str(), (char*)to_string(port).c_str(), NULL};
+        execve(exe.c_str(), argv, 0);
+        _exit(0);
+    }
+    pid_port[child_pid] = port;
+    port_coords[port] = {x, y};
+    usleep(50000);
+    StationClient(port).InitStation(port, x, y);
+}
+
+
+int getDistanceSqr(pair<int, int> p1, pair<int, int> p2) {
+    return ((p1.first-p2.first)*(p1.first-p2.first)+(p1.second-p2.second)*(p1.second-p2.second));
+}
+
+void linkStations(int port1, int port2) {
+    int d = getDistanceSqr(port_coords[port1], port_coords[port2]);
+    int cost = ceil(sqrt(d) * 1);
+    StationClient(port1).LinkStation(port2, cost);
+    StationClient(port2).LinkStation(port1, cost);
+    stations[port1].push_back(port2);
+    stations[port2].push_back(port1);
+}
+
+void loadStations() {
+    pqxx::work w(connection);
+
+    for (auto [port, x, y] : w.query<int, int, int>("select port, x, y from stations")) {
+        startStation(port, x, y);
+    }
+    cout << "[+] Loaded stations from db\n";
+    for (auto [port1, port2] : w.query<int, int>("select port1, port2 from links")) {
+        linkStations(port1, port2);
+    }
+    cout << "[+] Linked stations from db\n";
+}
+
+string generateId() {
+    FILE* rand = fopen("/dev/urandom", "rb");
+    char buf[0x10];
+    fread(buf, sizeof(buf), 1, rand);
+    fclose(rand);
+    char hex[0x20];
+    for (int i = 0; i < (int)sizeof(buf); ++i) {
+        sprintf(&hex[i*2], "%02hhx", buf[i]);
+    }
+    return string(hex);
+}
+
+bool checkCred(string cred) {
+    if (!(8 <= cred.size() && cred.size() <= 32)) {
+        return false;
+    }
+    for (auto c : cred) {
+        if (!(('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9')))
+            return false;
+    }
+    return true;
+}
+
+vector<int> calculateRoute(int from, int to) {
+    map<int, int> d;
+    map<int, int> p;
+    set<pair<int, int>> q;
+    d[from] = 0;
+    q.insert({0, from});
+    while (!q.empty()) {
+        auto [l, v] = *q.begin();
+        q.erase(q.begin());
+        for (auto u : stations[v]) {
+            int dist = getDistanceSqr(port_coords[v], port_coords[u]);
+            if (d.find(u) == d.end() || l + dist < d[u]) {
+                d[u] = l + dist;
+                p[u] = v;
+                q.insert(make_pair(d[u], u));
+            }
+        }
+    }
+    if (d.find(to) == d.end()) return {};
+    vector<int> route;
+    int x = to;
+    while (x != from) {
+        route.push_back(x);
+        x = p[x];
+    }
+    route.push_back(from);
+    return route;
+}
+
+int getBalance(string uid, pqxx::work &w) {
+    auto [user_balance] = *w.query<int>("select balance from users where id="+w.quote(uid)).begin();
+    return user_balance;
+}
+
+crow::response RegisterUser(const crow::request &req) {
+    try {
+        pqxx::work w(connection);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("username") || !json.has("password")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        string username = string(json["username"].s());
+        string password = string(json["password"].s());
+
+        if (!checkCred(username)) return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Username doesn't match regex /^[a-zA-Z0-9]{8,32}$/\"}");
+        if (!checkCred(password)) return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Password doesn't match regex /^[a-zA-Z0-9]{8,32}$/\"}");
+
+        auto r = w.exec_params("select 1 from users where username=$1", username);
+        if (!r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"User exists\"}");
+        }
+
+        string id = generateId();
+
+        w.exec_params("insert into users (id, username, password, balance) values ($1, $2, $3, 100)", id, username, password);
+        w.commit();
+
+        crow::json::wvalue resp;
+        resp["id"] = id;
+        return crow::response(crow::status::OK, resp);
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response LoginUser(const crow::request &req) {
+    try {
+        pqxx::work w(connection);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("username") || !json.has("password")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        string username = string(json["username"].s());
+        string password = string(json["password"].s());
+
+        auto r = w.exec_params("select id from users where username=$1 and password=$2", username, password);
+        if (r.empty()) {
+            return crow::response(crow::status::OK, "{\"error\":\"Wrong username or password\"}");
+        }
+
+        auto id = string(r[0][0].c_str());
+
+        crow::json::wvalue resp;
+        resp["id"] = id;
+        return crow::response(crow::status::OK, resp);
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response GetUser(const crow::request &req) {
+    try {
+        pqxx::work w(connection);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        string uid = string(json["uid"].s());
+        auto r = w.exec_params("select username, balance from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Invalid uid\"}");
+        }
+
+        auto [username, balance] = *w.query<string, int>("select username, balance from users where id="+w.quote(uid)).begin();
+        crow::json::wvalue res;
+
+        res["username"] = username;
+        res["uid"] = uid;
+        res["balance"] = balance;
+        return crow::response(crow::status::OK, res);
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response ListStations(const crow::request &req) {
+    try {
+        pqxx::work w(connection);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        string uid = string(json["uid"].s());
+        auto r = w.exec_params("select id from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Invalid uid\"}");
+        }
+
+        crow::json::wvalue::list res;
+        for (auto [port, x, y] : w.query<int, int, int>("select port, x, y from stations")) {
+            crow::json::wvalue station;
+            station["id"] = port;
+            station["x"] = x;
+            station["y"] = y;
+            res.push_back(station);
+        }
+
+        return crow::response(crow::status::OK, crow::json::wvalue(res));
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response ListLinks(const crow::request &req) {
+    try {
+        pqxx::work w(connection);
+
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        string uid = string(json["uid"].s());
+        auto r = w.exec_params("select id from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Invalid uid\"}");
+        }
+
+        crow::json::wvalue::list res;
+        for (auto [port1, port2] : w.query<int, int>("select port1, port2 from links")) {
+            crow::json::wvalue link;
+            link["id1"] = port1;
+            link["id2"] = port2;
+            res.push_back(link);
+        }
+        return crow::response(crow::status::OK, crow::json::wvalue(res));
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response CalcRoute(const crow::request &req) {
+    try {
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid") || !json.has("from") | !json.has("to")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        pqxx::work w(connection);
+
+        string uid = json["uid"].s();
+        auto r = w.exec_params("select id from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED);
+        }
+
+        auto from = json["from"].i();
+        auto to = json["to"].i();
+
+        vector<int> route_vec = calculateRoute(from, to);
+
+        crow::json::wvalue::list res;
+        for (auto station: route_vec) {
+            res.push_back(station);
+        }
+
+        return crow::response(crow::status::OK, crow::json::wvalue(res));
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+
+crow::response SendOil(const crow::request &req) {
+    try {
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid") || !json.has("receiver_id") | !json.has("msg") || !json.has("money") || !json.has("from") || !json.has("to")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        pqxx::work w(connection);
+
+        string uid = json["uid"].s();
+        auto r = w.exec_params("select balance from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED);
+        }
+        string receiver_id = json["receiver_id"].s();
+        r = w.exec_params("select id from users where id=$1", receiver_id);
+        if (r.empty()) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid receiver_id\"}");
+        }
+
+        int user_balance = getBalance(uid, w);
+
+        auto money = json["money"].i();
+        auto from = json["from"].i();
+        auto to = json["to"].i();
+        string msg = json["msg"].s();
+        if (money <= 0) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"money must be > 0\"}");
+        }
+        if (money > user_balance) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"money is too big\"}");
+        }
+        if (stations.find(from) == stations.end()) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid source\"}");
+        }
+        if (stations.find(to) == stations.end()) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid destination\"}");
+        }
+
+        user_balance -= money;
+        w.exec_params("update users set balance=$2 where id=$1", uid, user_balance);
+        w.commit();
+
+        vector<int> route_vec = calculateRoute(from, to);
+        if (route_vec.size() == 0) {
+            return crow::response(crow::status::OK, "{\"error\":\"Stations aren't linked\"}");
+        }
+
+        RepeatedField<int> route(route_vec.begin(), route_vec.end());
+        StationClient(from).SendOil(uid, receiver_id, msg, money, route);
+
+        return crow::response(crow::status::OK, "{\"data\":\"ok\"}");
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+crow::response AddMoney(const crow::request &req) {
+    try {
+        auto json = crow::json::load(req.body);
+        if (!json || !json.has("uid") || !json.has("amount") || !json.has("station_id") || !json.has("oil_id")) {
+            return crow::response(crow::status::BAD_REQUEST);
+        }
+        pqxx::work w(connection);
+
+        string uid = json["uid"].s();
+        auto r = w.exec_params("select 1 from users where id=$1", uid);
+        if (r.empty()) {
+            return crow::response(crow::status::UNAUTHORIZED);
+        }
+
+        auto user_balance = getBalance(uid, w);
+        auto amount = json["amount"].i();
+        auto station_id = json["station_id"].i();
+        auto oil_id = json["oil_id"].i();
+        if (amount > user_balance) {
+            return crow::response(crow::status::OK, "{\"error\":\"Invalid amount\"}");
+        }
+        if (port_coords.find(station_id) == port_coords.end()) {
+            return crow::response(crow::status::OK, "{\"error\":\"Invalid station_id\"}");
+        }
+        user_balance -= amount;
+        w.exec_params("update users set balance=$2 where id=$1", uid, user_balance);
+        w.commit();
+
+        StationClient(station_id).AddMoney(amount, oil_id);
+        return crow::response(crow::status::OK, "{\"data\":\"ok\"}");
+    }
+    catch (...) {
+        return crow::response(crow::status::BAD_REQUEST);
+    }
+}
+
+map<crow::websocket::connection*, string> connection_user;
+map<string, set<crow::websocket::connection*>> user_connections;
+
+/*
+void *processRequest(void *arg) {
+    int fd = *((int*)arg);
+    SocketResponse res;
+    read(fd, &res, sizeof(res));
+    status resp = OK;
+    write(fd, &resp, sizeof(resp));
+    close(fd);
+
+    string user_id(&res.uid[0], &res.uid[0x20]);
+
+    if (res.code == NO_MONEY) {
+        auto resp = crow::json::wvalue();
+        resp["data"] = "out of money";
+        resp["station_id"] = res.station_id;
+        resp["oil_id"] = res.oil_id;
+        for (auto conn : user_connections[user_id]) {
+            conn->send_text(resp.dump());
+        }
+        return NULL;
+    }
+    if (res.code == PASS) {
+        auto resp = crow::json::wvalue();
+        resp["data"] = "succesfully passed";
+        resp["station_id"] = res.station_id;
+        for (auto conn : user_connections[user_id]) {
+            conn->send_text(resp.dump());
+        }
+        return NULL;
+    }
+    if (res.code == READY) {
+        auto resp = crow::json::wvalue();
+        resp["data"] = "ready to receive";
+        resp["station_id"] = res.station_id;
+        resp["oil_id"] = res.oil_id;
+        for (auto conn : user_connections[user_id]) {
+            conn->send_text(resp.dump());
+        }
+        return NULL;
+    }
+
+    return NULL;
+}
+*/
+
+class MainStationImpl final : public MainStation::Service {
+    public:
+    grpc::Status Info(ServerContext */*context*/, const InfoRequest *req, None */*resp*/) override {
+        if (req->code() == NO_MONEY) {
+
+        }
+        return grpc::Status::OK;     
+    }
+
+    grpc::Status Passed(ServerContext *, const PassedRequest *req, None *) override {
+        cout << "Passed; uid: " << req->uid() << "; receiver_id: " << req->receiver_id() << "; station_id: " << req->station_id() << '\n';
+        return grpc::Status::OK;
+    }
+
+    grpc::Status NoMoney(ServerContext *, const NoMoneyRequest *req, None *) override {
+        cout << "NoMoney; uid: " << req->uid() << "; receiver_id: " << req->receiver_id() << "; station_id: " << req->station_id() << "; oil_id: " << req->oil_id() << '\n';
+        return grpc::Status::OK;
+    }
+
+    grpc::Status GetOil(ServerContext *, const GetOilRequest *req, None *) override {
+        cout << "GetOil; uid: " << req->uid() << "; msg: " << req->msg() << "; receiver_id: " << req->receiver_id() << '\n';
+        return grpc::Status::OK;
+    }
+};
+
+void *runMainStation(void *) {
+    MainStationImpl service;
+
+    ServerBuilder builder;
+    builder.AddListeningPort("127.0.0.1:8888", grpc::InsecureServerCredentials());
+    builder.RegisterService(&service);
+    unique_ptr<Server> server(builder.BuildAndStart());
+    cout << "Main station listening on 8888\n";
+    server->Wait();
+    return NULL;
+}
+
+void *healthcheck(void *) {
+    int status;
+    pid_t wpid;
+    while (1) {
+        wpid = waitpid(0, &status, WNOHANG);
+        if (wpid > 0 && WIFSIGNALED(status) && !(WTERMSIG(status) == SIGKILL || WTERMSIG(status) == SIGINT)) {
+            cout << wpid << " segfaulted (" << WTERMSIG(status) << ")\n";
+            int port = pid_port[wpid];
+            auto [x, y] = port_coords[port];
+            pid_port.erase(wpid);
+            startStation(port, x, y);
+        }
+    }
+}
+
+int main() {
+    loadStations();
+    pthread_t main_station_thread;
+    pthread_create(&main_station_thread, NULL, runMainStation, NULL);
+
+    pthread_t healthcheck_thread;
+    pthread_create(&healthcheck_thread, NULL, healthcheck, NULL);
+
+    crow::SimpleApp app;
+    mutex mtx;
+
+    CROW_ROUTE(app, "/api/register").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return RegisterUser(req);
+        });
+
+    CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return LoginUser(req);
+        });
+
+    CROW_ROUTE(app, "/api/user").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return GetUser(req);
+        });
+
+    CROW_ROUTE(app, "/api/stations").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return ListStations(req);
+        });
+
+    CROW_ROUTE(app, "/api/links").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return ListLinks(req);
+        });
+
+    CROW_ROUTE(app, "/api/route").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req){
+            return CalcRoute(req);
+        });
+
+    CROW_ROUTE(app, "/api/send").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req) {
+            return SendOil(req);
+        });
+    
+    CROW_ROUTE(app, "/api/add_money").methods(crow::HTTPMethod::Post)(
+        [](const crow::request &req) {
+            return AddMoney(req);
+        });
+    
+    CROW_WEBSOCKET_ROUTE(app, "/ws")
+        .onclose([&mtx](crow::websocket::connection &conn, const string &reason){
+            CROW_LOG_INFO << "websocket connection closing, reason: " << reason;
+            lock_guard<mutex> _(mtx);
+            if (connection_user.find(&conn) != connection_user.end()) {
+                string uid = connection_user[&conn];
+                user_connections[uid].erase(&conn);
+                connection_user.erase(&conn);
+            }
+        })
+        .onmessage([&mtx](crow::websocket::connection &conn, const string &data, bool /*is_binary*/) {
+            CROW_LOG_INFO << "websocket onmessage";
+            lock_guard<mutex> _(mtx);
+            try {
+                auto json = crow::json::load(data);
+                if (!json || !json.has("type") || !json.has("uid")) {
+                    conn.send_text("{\"error\":\"Invalid json\"}");
+                    return;
+                }
+                string uid = json["uid"].s();
+                if (json["type"].s() == "INIT") {
+                    connection_user[&conn] = uid;
+                    user_connections[uid].insert(&conn);
+                    conn.send_text("{\"data\":\"ok\"}");
+                    return;
+                }
+            }
+            catch (...) {
+                conn.send_text("{\"error\":\"Invalid json\"}");
+                return;
+            }
+        });
+    
+    app.bindaddr("0.0.0.0").port(8000).run();
+
+    for (auto [pid, port] : pid_port) {
+        kill(pid, SIGKILL);
+    }
+    system("rm -rf stations/*");
+
+    return 0;
+}

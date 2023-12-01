@@ -1,0 +1,75 @@
+syntax="proto3";
+
+service MainStation {
+    rpc Info(InfoRequest) returns (None) {}
+    rpc Passed(PassedRequest) returns (None) {}
+    rpc NoMoney(NoMoneyRequest) returns (None) {}
+    rpc GetOil(GetOilRequest) returns (None) {}
+}
+
+enum Status {
+    STATUS_UNSPECIFIED = 0;
+    OK = 1;
+    NO_MONEY = 2;
+    PASS = 3;
+    READY = 4;
+    INVALID_OIL_ID = 5;
+}
+
+message InfoRequest {
+    Status code = 1;
+    string message = 2;
+}
+
+message PassedRequest {
+    string uid = 1;
+    string receiver_id = 2;
+    int64 station_id = 3;
+}
+
+message NoMoneyRequest {
+    string uid = 1;
+    string receiver_id = 2;
+    int64 station_id = 3;
+    int64 oil_id = 4;
+}
+
+message GetOilRequest {
+    string uid = 1;
+    string msg = 2;
+    string receiver_id = 3;
+}
+
+service Station {
+    rpc Init(InitRequest) returns (None) {}
+    rpc Link(LinkRequest) returns (None) {}
+    rpc SendOil(SendOilRequest) returns (None) {}
+    rpc AddMoney(AddMoneyRequest) returns (None) {}
+}
+
+message InitRequest {
+    int32 port = 1;
+    int32 x = 2;
+    int32 y = 3;
+}
+
+message LinkRequest {
+    int32 port = 1;
+    int32 cost = 2;
+}
+
+message SendOilRequest {
+    string uid = 1;
+    string receiver_id = 2;
+    string msg = 3;
+    int64 money = 4;
+    repeated int32 route = 5;
+}
+
+message AddMoneyRequest {
+    int32 amount = 2;
+    int32 oil_id = 3;
+}
+
+message None {
+}

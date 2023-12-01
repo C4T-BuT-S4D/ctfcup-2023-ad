@@ -1,0 +1,27 @@
+version: "2.4"
+
+services:
+  backend:
+    build: .
+    cpus: 4
+    mem_limit: 512m
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      PG_CONNECTION: "host=db port=5432 user=app password=app dbname=app sslmode=disable"
+    depends_on:
+      - db
+    volumes:
+      - ./app/:/app/
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - "./vol/db:/var/lib/postgresql/data"
+      - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
