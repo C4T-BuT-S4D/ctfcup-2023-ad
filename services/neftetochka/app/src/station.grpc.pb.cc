@@ -21,7 +21,6 @@
 #include <grpcpp/support/sync_stream.h>
 
 static const char* MainStation_method_names[] = {
-  "/MainStation/Info",
   "/MainStation/Passed",
   "/MainStation/NoMoney",
   "/MainStation/GetOil",
@@ -34,34 +33,10 @@ std::unique_ptr< MainStation::Stub> MainStation::NewStub(const std::shared_ptr< 
 }
 
 MainStation::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
-  : channel_(channel), rpcmethod_Info_(MainStation_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Passed_(MainStation_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_NoMoney_(MainStation_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetOil_(MainStation_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_Passed_(MainStation_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_NoMoney_(MainStation_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetOil_(MainStation_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
-
-::grpc::Status MainStation::Stub::Info(::grpc::ClientContext* context, const ::InfoRequest& request, ::None* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::InfoRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Info_, context, request, response);
-}
-
-void MainStation::Stub::async::Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::InfoRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Info_, context, request, response, std::move(f));
-}
-
-void MainStation::Stub::async::Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Info_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::None>* MainStation::Stub::PrepareAsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::None, ::InfoRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Info_, context, request);
-}
-
-::grpc::ClientAsyncResponseReader< ::None>* MainStation::Stub::AsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-  auto* result =
-    this->PrepareAsyncInfoRaw(context, request, cq);
-  result->StartCall();
-  return result;
-}
 
 ::grpc::Status MainStation::Stub::Passed(::grpc::ClientContext* context, const ::PassedRequest& request, ::None* response) {
   return ::grpc::internal::BlockingUnaryCall< ::PassedRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Passed_, context, request, response);
@@ -136,16 +111,6 @@ MainStation::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       MainStation_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< MainStation::Service, ::InfoRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
-          [](MainStation::Service* service,
-             ::grpc::ServerContext* ctx,
-             const ::InfoRequest* req,
-             ::None* resp) {
-               return service->Info(ctx, req, resp);
-             }, this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      MainStation_method_names[1],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< MainStation::Service, ::PassedRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](MainStation::Service* service,
              ::grpc::ServerContext* ctx,
@@ -154,7 +119,7 @@ MainStation::Service::Service() {
                return service->Passed(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      MainStation_method_names[2],
+      MainStation_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< MainStation::Service, ::NoMoneyRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](MainStation::Service* service,
@@ -164,7 +129,7 @@ MainStation::Service::Service() {
                return service->NoMoney(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      MainStation_method_names[3],
+      MainStation_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< MainStation::Service, ::GetOilRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](MainStation::Service* service,
@@ -176,13 +141,6 @@ MainStation::Service::Service() {
 }
 
 MainStation::Service::~Service() {
-}
-
-::grpc::Status MainStation::Service::Info(::grpc::ServerContext* context, const ::InfoRequest* request, ::None* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
 ::grpc::Status MainStation::Service::Passed(::grpc::ServerContext* context, const ::PassedRequest* request, ::None* response) {

@@ -20,25 +20,12 @@ PROTOBUF_PRAGMA_INIT_SEG
 namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
-PROTOBUF_CONSTEXPR InfoRequest::InfoRequest(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.message_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.code_)*/0
-  , /*decltype(_impl_._cached_size_)*/{}} {}
-struct InfoRequestDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR InfoRequestDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~InfoRequestDefaultTypeInternal() {}
-  union {
-    InfoRequest _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 InfoRequestDefaultTypeInternal _InfoRequest_default_instance_;
 PROTOBUF_CONSTEXPR PassedRequest::PassedRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.uid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.receiver_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.station_id_)*/int64_t{0}
+  , /*decltype(_impl_.money_)*/int64_t{0}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct PassedRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR PassedRequestDefaultTypeInternal()
@@ -55,6 +42,7 @@ PROTOBUF_CONSTEXPR NoMoneyRequest::NoMoneyRequest(
   , /*decltype(_impl_.receiver_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.station_id_)*/int64_t{0}
   , /*decltype(_impl_.oil_id_)*/int64_t{0}
+  , /*decltype(_impl_.money_)*/int64_t{0}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct NoMoneyRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR NoMoneyRequestDefaultTypeInternal()
@@ -70,6 +58,7 @@ PROTOBUF_CONSTEXPR GetOilRequest::GetOilRequest(
     /*decltype(_impl_.uid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.msg_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.receiver_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.station_id_)*/int64_t{0}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct GetOilRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR GetOilRequestDefaultTypeInternal()
@@ -152,19 +141,11 @@ struct NoneDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 NoneDefaultTypeInternal _None_default_instance_;
-static ::_pb::Metadata file_level_metadata_station_2eproto[9];
+static ::_pb::Metadata file_level_metadata_station_2eproto[8];
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_station_2eproto[1];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_station_2eproto = nullptr;
 
 const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::InfoRequest, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::InfoRequest, _impl_.code_),
-  PROTOBUF_FIELD_OFFSET(::InfoRequest, _impl_.message_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::PassedRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -174,6 +155,7 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::PassedRequest, _impl_.uid_),
   PROTOBUF_FIELD_OFFSET(::PassedRequest, _impl_.receiver_id_),
   PROTOBUF_FIELD_OFFSET(::PassedRequest, _impl_.station_id_),
+  PROTOBUF_FIELD_OFFSET(::PassedRequest, _impl_.money_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::NoMoneyRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -184,6 +166,7 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::NoMoneyRequest, _impl_.receiver_id_),
   PROTOBUF_FIELD_OFFSET(::NoMoneyRequest, _impl_.station_id_),
   PROTOBUF_FIELD_OFFSET(::NoMoneyRequest, _impl_.oil_id_),
+  PROTOBUF_FIELD_OFFSET(::NoMoneyRequest, _impl_.money_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -193,6 +176,7 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.uid_),
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.msg_),
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.receiver_id_),
+  PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.station_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::InitRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -237,19 +221,17 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   ~0u,  // no _inlined_string_donated_
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::InfoRequest)},
-  { 8, -1, -1, sizeof(::PassedRequest)},
-  { 17, -1, -1, sizeof(::NoMoneyRequest)},
-  { 27, -1, -1, sizeof(::GetOilRequest)},
-  { 36, -1, -1, sizeof(::InitRequest)},
-  { 45, -1, -1, sizeof(::LinkRequest)},
-  { 53, -1, -1, sizeof(::SendOilRequest)},
-  { 64, -1, -1, sizeof(::AddMoneyRequest)},
-  { 72, -1, -1, sizeof(::None)},
+  { 0, -1, -1, sizeof(::PassedRequest)},
+  { 10, -1, -1, sizeof(::NoMoneyRequest)},
+  { 21, -1, -1, sizeof(::GetOilRequest)},
+  { 31, -1, -1, sizeof(::InitRequest)},
+  { 40, -1, -1, sizeof(::LinkRequest)},
+  { 48, -1, -1, sizeof(::SendOilRequest)},
+  { 59, -1, -1, sizeof(::AddMoneyRequest)},
+  { 67, -1, -1, sizeof(::None)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::_InfoRequest_default_instance_._instance,
   &::_PassedRequest_default_instance_._instance,
   &::_NoMoneyRequest_default_instance_._instance,
   &::_GetOilRequest_default_instance_._instance,
@@ -261,36 +243,35 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_station_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\rstation.proto\"5\n\013InfoRequest\022\025\n\004code\030\001"
-  " \001(\0162\007.Status\022\017\n\007message\030\002 \001(\t\"E\n\rPassed"
-  "Request\022\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_id\030\002 \001("
-  "\t\022\022\n\nstation_id\030\003 \001(\003\"V\n\016NoMoneyRequest\022"
+  "\n\rstation.proto\"T\n\rPassedRequest\022\013\n\003uid\030"
+  "\001 \001(\t\022\023\n\013receiver_id\030\002 \001(\t\022\022\n\nstation_id"
+  "\030\003 \001(\003\022\r\n\005money\030\004 \001(\003\"e\n\016NoMoneyRequest\022"
   "\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_id\030\002 \001(\t\022\022\n\nsta"
-  "tion_id\030\003 \001(\003\022\016\n\006oil_id\030\004 \001(\003\">\n\rGetOilR"
-  "equest\022\013\n\003uid\030\001 \001(\t\022\013\n\003msg\030\002 \001(\t\022\023\n\013rece"
-  "iver_id\030\003 \001(\t\"1\n\013InitRequest\022\014\n\004port\030\001 \001"
-  "(\005\022\t\n\001x\030\002 \001(\005\022\t\n\001y\030\003 \001(\005\")\n\013LinkRequest\022"
-  "\014\n\004port\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005\"]\n\016SendOilRe"
-  "quest\022\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_id\030\002 \001(\t\022"
-  "\013\n\003msg\030\003 \001(\t\022\r\n\005money\030\004 \001(\003\022\r\n\005route\030\005 \003"
-  "(\005\"1\n\017AddMoneyRequest\022\016\n\006amount\030\002 \001(\005\022\016\n"
-  "\006oil_id\030\003 \001(\005\"\006\n\004None*_\n\006Status\022\026\n\022STATU"
-  "S_UNSPECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010NO_MONEY\020\002\022\010\n"
-  "\004PASS\020\003\022\t\n\005READY\020\004\022\022\n\016INVALID_OIL_ID\020\0052\227"
-  "\001\n\013MainStation\022\035\n\004Info\022\014.InfoRequest\032\005.N"
-  "one\"\000\022!\n\006Passed\022\016.PassedRequest\032\005.None\"\000"
-  "\022#\n\007NoMoney\022\017.NoMoneyRequest\032\005.None\"\000\022!\n"
-  "\006GetOil\022\016.GetOilRequest\032\005.None\"\0002\223\001\n\007Sta"
-  "tion\022\035\n\004Init\022\014.InitRequest\032\005.None\"\000\022\035\n\004L"
-  "ink\022\014.LinkRequest\032\005.None\"\000\022#\n\007SendOil\022\017."
-  "SendOilRequest\032\005.None\"\000\022%\n\010AddMoney\022\020.Ad"
-  "dMoneyRequest\032\005.None\"\000b\006proto3"
+  "tion_id\030\003 \001(\003\022\016\n\006oil_id\030\004 \001(\003\022\r\n\005money\030\005"
+  " \001(\003\"R\n\rGetOilRequest\022\013\n\003uid\030\001 \001(\t\022\013\n\003ms"
+  "g\030\002 \001(\t\022\023\n\013receiver_id\030\003 \001(\t\022\022\n\nstation_"
+  "id\030\004 \001(\003\"1\n\013InitRequest\022\014\n\004port\030\001 \001(\005\022\t\n"
+  "\001x\030\002 \001(\005\022\t\n\001y\030\003 \001(\005\")\n\013LinkRequest\022\014\n\004po"
+  "rt\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005\"]\n\016SendOilRequest"
+  "\022\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_id\030\002 \001(\t\022\013\n\003ms"
+  "g\030\003 \001(\t\022\r\n\005money\030\004 \001(\003\022\r\n\005route\030\005 \003(\005\"1\n"
+  "\017AddMoneyRequest\022\016\n\006amount\030\002 \001(\005\022\016\n\006oil_"
+  "id\030\003 \001(\005\"\006\n\004None*_\n\006Status\022\026\n\022STATUS_UNS"
+  "PECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010NO_MONEY\020\002\022\010\n\004PASS"
+  "\020\003\022\t\n\005READY\020\004\022\022\n\016INVALID_OIL_ID\020\0052x\n\013Mai"
+  "nStation\022!\n\006Passed\022\016.PassedRequest\032\005.Non"
+  "e\"\000\022#\n\007NoMoney\022\017.NoMoneyRequest\032\005.None\"\000"
+  "\022!\n\006GetOil\022\016.GetOilRequest\032\005.None\"\0002\223\001\n\007"
+  "Station\022\035\n\004Init\022\014.InitRequest\032\005.None\"\000\022\035"
+  "\n\004Link\022\014.LinkRequest\032\005.None\"\000\022#\n\007SendOil"
+  "\022\017.SendOilRequest\032\005.None\"\000\022%\n\010AddMoney\022\020"
+  ".AddMoneyRequest\032\005.None\"\000b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_station_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_station_2eproto = {
-    false, false, 950, descriptor_table_protodef_station_2eproto,
+    false, false, 913, descriptor_table_protodef_station_2eproto,
     "station.proto",
-    &descriptor_table_station_2eproto_once, nullptr, 0, 9,
+    &descriptor_table_station_2eproto_once, nullptr, 0, 8,
     schemas, file_default_instances, TableStruct_station_2eproto::offsets,
     file_level_metadata_station_2eproto, file_level_enum_descriptors_station_2eproto,
     file_level_service_descriptors_station_2eproto,
@@ -322,239 +303,6 @@ bool Status_IsValid(int value) {
 
 // ===================================================================
 
-class InfoRequest::_Internal {
- public:
-};
-
-InfoRequest::InfoRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:InfoRequest)
-}
-InfoRequest::InfoRequest(const InfoRequest& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  InfoRequest* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_.message_){}
-    , decltype(_impl_.code_){}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.message_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.message_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_message().empty()) {
-    _this->_impl_.message_.Set(from._internal_message(), 
-      _this->GetArenaForAllocation());
-  }
-  _this->_impl_.code_ = from._impl_.code_;
-  // @@protoc_insertion_point(copy_constructor:InfoRequest)
-}
-
-inline void InfoRequest::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.message_){}
-    , decltype(_impl_.code_){0}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
-  _impl_.message_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.message_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-}
-
-InfoRequest::~InfoRequest() {
-  // @@protoc_insertion_point(destructor:InfoRequest)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
-  SharedDtor();
-}
-
-inline void InfoRequest::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.message_.Destroy();
-}
-
-void InfoRequest::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void InfoRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:InfoRequest)
-  uint32_t cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _impl_.message_.ClearToEmpty();
-  _impl_.code_ = 0;
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
-}
-
-const char* InfoRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // .Status code = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          _internal_set_code(static_cast<::Status>(val));
-        } else
-          goto handle_unusual;
-        continue;
-      // string message = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          auto str = _internal_mutable_message();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "InfoRequest.message"));
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
-}
-
-uint8_t* InfoRequest::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:InfoRequest)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // .Status code = 1;
-  if (this->_internal_code() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_code(), target);
-  }
-
-  // string message = 2;
-  if (!this->_internal_message().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_message().data(), static_cast<int>(this->_internal_message().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "InfoRequest.message");
-    target = stream->WriteStringMaybeAliased(
-        2, this->_internal_message(), target);
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:InfoRequest)
-  return target;
-}
-
-size_t InfoRequest::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:InfoRequest)
-  size_t total_size = 0;
-
-  uint32_t cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string message = 2;
-  if (!this->_internal_message().empty()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_message());
-  }
-
-  // .Status code = 1;
-  if (this->_internal_code() != 0) {
-    total_size += 1 +
-      ::_pbi::WireFormatLite::EnumSize(this->_internal_code());
-  }
-
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
-}
-
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData InfoRequest::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    InfoRequest::MergeImpl
-};
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*InfoRequest::GetClassData() const { return &_class_data_; }
-
-
-void InfoRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<InfoRequest*>(&to_msg);
-  auto& from = static_cast<const InfoRequest&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:InfoRequest)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (!from._internal_message().empty()) {
-    _this->_internal_set_message(from._internal_message());
-  }
-  if (from._internal_code() != 0) {
-    _this->_internal_set_code(from._internal_code());
-  }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-}
-
-void InfoRequest::CopyFrom(const InfoRequest& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:InfoRequest)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool InfoRequest::IsInitialized() const {
-  return true;
-}
-
-void InfoRequest::InternalSwap(InfoRequest* other) {
-  using std::swap;
-  auto* lhs_arena = GetArenaForAllocation();
-  auto* rhs_arena = other->GetArenaForAllocation();
-  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.message_, lhs_arena,
-      &other->_impl_.message_, rhs_arena
-  );
-  swap(_impl_.code_, other->_impl_.code_);
-}
-
-::PROTOBUF_NAMESPACE_ID::Metadata InfoRequest::GetMetadata() const {
-  return ::_pbi::AssignDescriptors(
-      &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[0]);
-}
-
-// ===================================================================
-
 class PassedRequest::_Internal {
  public:
 };
@@ -572,6 +320,7 @@ PassedRequest::PassedRequest(const PassedRequest& from)
       decltype(_impl_.uid_){}
     , decltype(_impl_.receiver_id_){}
     , decltype(_impl_.station_id_){}
+    , decltype(_impl_.money_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -591,7 +340,9 @@ PassedRequest::PassedRequest(const PassedRequest& from)
     _this->_impl_.receiver_id_.Set(from._internal_receiver_id(), 
       _this->GetArenaForAllocation());
   }
-  _this->_impl_.station_id_ = from._impl_.station_id_;
+  ::memcpy(&_impl_.station_id_, &from._impl_.station_id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.money_) -
+    reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.money_));
   // @@protoc_insertion_point(copy_constructor:PassedRequest)
 }
 
@@ -603,6 +354,7 @@ inline void PassedRequest::SharedCtor(
       decltype(_impl_.uid_){}
     , decltype(_impl_.receiver_id_){}
     , decltype(_impl_.station_id_){int64_t{0}}
+    , decltype(_impl_.money_){int64_t{0}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.uid_.InitDefault();
@@ -642,7 +394,9 @@ void PassedRequest::Clear() {
 
   _impl_.uid_.ClearToEmpty();
   _impl_.receiver_id_.ClearToEmpty();
-  _impl_.station_id_ = int64_t{0};
+  ::memset(&_impl_.station_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.money_) -
+      reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.money_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -676,6 +430,14 @@ const char* PassedRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext*
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           _impl_.station_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 money = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.money_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -735,6 +497,12 @@ uint8_t* PassedRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt64ToArray(3, this->_internal_station_id(), target);
   }
 
+  // int64 money = 4;
+  if (this->_internal_money() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(4, this->_internal_money(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -770,6 +538,11 @@ size_t PassedRequest::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_station_id());
   }
 
+  // int64 money = 4;
+  if (this->_internal_money() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_money());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -796,6 +569,9 @@ void PassedRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::
   }
   if (from._internal_station_id() != 0) {
     _this->_internal_set_station_id(from._internal_station_id());
+  }
+  if (from._internal_money() != 0) {
+    _this->_internal_set_money(from._internal_money());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -824,13 +600,18 @@ void PassedRequest::InternalSwap(PassedRequest* other) {
       &_impl_.receiver_id_, lhs_arena,
       &other->_impl_.receiver_id_, rhs_arena
   );
-  swap(_impl_.station_id_, other->_impl_.station_id_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PassedRequest, _impl_.money_)
+      + sizeof(PassedRequest::_impl_.money_)
+      - PROTOBUF_FIELD_OFFSET(PassedRequest, _impl_.station_id_)>(
+          reinterpret_cast<char*>(&_impl_.station_id_),
+          reinterpret_cast<char*>(&other->_impl_.station_id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata PassedRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[1]);
+      file_level_metadata_station_2eproto[0]);
 }
 
 // ===================================================================
@@ -853,6 +634,7 @@ NoMoneyRequest::NoMoneyRequest(const NoMoneyRequest& from)
     , decltype(_impl_.receiver_id_){}
     , decltype(_impl_.station_id_){}
     , decltype(_impl_.oil_id_){}
+    , decltype(_impl_.money_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -873,8 +655,8 @@ NoMoneyRequest::NoMoneyRequest(const NoMoneyRequest& from)
       _this->GetArenaForAllocation());
   }
   ::memcpy(&_impl_.station_id_, &from._impl_.station_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.oil_id_) -
-    reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.oil_id_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.money_) -
+    reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.money_));
   // @@protoc_insertion_point(copy_constructor:NoMoneyRequest)
 }
 
@@ -887,6 +669,7 @@ inline void NoMoneyRequest::SharedCtor(
     , decltype(_impl_.receiver_id_){}
     , decltype(_impl_.station_id_){int64_t{0}}
     , decltype(_impl_.oil_id_){int64_t{0}}
+    , decltype(_impl_.money_){int64_t{0}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.uid_.InitDefault();
@@ -927,8 +710,8 @@ void NoMoneyRequest::Clear() {
   _impl_.uid_.ClearToEmpty();
   _impl_.receiver_id_.ClearToEmpty();
   ::memset(&_impl_.station_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.oil_id_) -
-      reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.oil_id_));
+      reinterpret_cast<char*>(&_impl_.money_) -
+      reinterpret_cast<char*>(&_impl_.station_id_)) + sizeof(_impl_.money_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -970,6 +753,14 @@ const char* NoMoneyRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _impl_.oil_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 money = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          _impl_.money_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1035,6 +826,12 @@ uint8_t* NoMoneyRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt64ToArray(4, this->_internal_oil_id(), target);
   }
 
+  // int64 money = 5;
+  if (this->_internal_money() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(5, this->_internal_money(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1075,6 +872,11 @@ size_t NoMoneyRequest::ByteSizeLong() const {
     total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_oil_id());
   }
 
+  // int64 money = 5;
+  if (this->_internal_money() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_money());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -1105,6 +907,9 @@ void NoMoneyRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   if (from._internal_oil_id() != 0) {
     _this->_internal_set_oil_id(from._internal_oil_id());
   }
+  if (from._internal_money() != 0) {
+    _this->_internal_set_money(from._internal_money());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1133,8 +938,8 @@ void NoMoneyRequest::InternalSwap(NoMoneyRequest* other) {
       &other->_impl_.receiver_id_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(NoMoneyRequest, _impl_.oil_id_)
-      + sizeof(NoMoneyRequest::_impl_.oil_id_)
+      PROTOBUF_FIELD_OFFSET(NoMoneyRequest, _impl_.money_)
+      + sizeof(NoMoneyRequest::_impl_.money_)
       - PROTOBUF_FIELD_OFFSET(NoMoneyRequest, _impl_.station_id_)>(
           reinterpret_cast<char*>(&_impl_.station_id_),
           reinterpret_cast<char*>(&other->_impl_.station_id_));
@@ -1143,7 +948,7 @@ void NoMoneyRequest::InternalSwap(NoMoneyRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata NoMoneyRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[2]);
+      file_level_metadata_station_2eproto[1]);
 }
 
 // ===================================================================
@@ -1165,6 +970,7 @@ GetOilRequest::GetOilRequest(const GetOilRequest& from)
       decltype(_impl_.uid_){}
     , decltype(_impl_.msg_){}
     , decltype(_impl_.receiver_id_){}
+    , decltype(_impl_.station_id_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -1192,6 +998,7 @@ GetOilRequest::GetOilRequest(const GetOilRequest& from)
     _this->_impl_.receiver_id_.Set(from._internal_receiver_id(), 
       _this->GetArenaForAllocation());
   }
+  _this->_impl_.station_id_ = from._impl_.station_id_;
   // @@protoc_insertion_point(copy_constructor:GetOilRequest)
 }
 
@@ -1203,6 +1010,7 @@ inline void GetOilRequest::SharedCtor(
       decltype(_impl_.uid_){}
     , decltype(_impl_.msg_){}
     , decltype(_impl_.receiver_id_){}
+    , decltype(_impl_.station_id_){int64_t{0}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.uid_.InitDefault();
@@ -1248,6 +1056,7 @@ void GetOilRequest::Clear() {
   _impl_.uid_.ClearToEmpty();
   _impl_.msg_.ClearToEmpty();
   _impl_.receiver_id_.ClearToEmpty();
+  _impl_.station_id_ = int64_t{0};
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1284,6 +1093,14 @@ const char* GetOilRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext*
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
           CHK_(::_pbi::VerifyUTF8(str, "GetOilRequest.receiver_id"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 station_id = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.station_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
@@ -1346,6 +1163,12 @@ uint8_t* GetOilRequest::_InternalSerialize(
         3, this->_internal_receiver_id(), target);
   }
 
+  // int64 station_id = 4;
+  if (this->_internal_station_id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(4, this->_internal_station_id(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1383,6 +1206,11 @@ size_t GetOilRequest::ByteSizeLong() const {
         this->_internal_receiver_id());
   }
 
+  // int64 station_id = 4;
+  if (this->_internal_station_id() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_station_id());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -1409,6 +1237,9 @@ void GetOilRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::
   }
   if (!from._internal_receiver_id().empty()) {
     _this->_internal_set_receiver_id(from._internal_receiver_id());
+  }
+  if (from._internal_station_id() != 0) {
+    _this->_internal_set_station_id(from._internal_station_id());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -1441,12 +1272,13 @@ void GetOilRequest::InternalSwap(GetOilRequest* other) {
       &_impl_.receiver_id_, lhs_arena,
       &other->_impl_.receiver_id_, rhs_arena
   );
+  swap(_impl_.station_id_, other->_impl_.station_id_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GetOilRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[3]);
+      file_level_metadata_station_2eproto[2]);
 }
 
 // ===================================================================
@@ -1681,7 +1513,7 @@ void InitRequest::InternalSwap(InitRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata InitRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[4]);
+      file_level_metadata_station_2eproto[3]);
 }
 
 // ===================================================================
@@ -1892,7 +1724,7 @@ void LinkRequest::InternalSwap(LinkRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LinkRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[5]);
+      file_level_metadata_station_2eproto[4]);
 }
 
 // ===================================================================
@@ -2264,7 +2096,7 @@ void SendOilRequest::InternalSwap(SendOilRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SendOilRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[6]);
+      file_level_metadata_station_2eproto[5]);
 }
 
 // ===================================================================
@@ -2475,7 +2307,7 @@ void AddMoneyRequest::InternalSwap(AddMoneyRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata AddMoneyRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[7]);
+      file_level_metadata_station_2eproto[6]);
 }
 
 // ===================================================================
@@ -2515,15 +2347,11 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*None::GetClassData() const { r
 ::PROTOBUF_NAMESPACE_ID::Metadata None::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[8]);
+      file_level_metadata_station_2eproto[7]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::InfoRequest*
-Arena::CreateMaybeMessage< ::InfoRequest >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::InfoRequest >(arena);
-}
 template<> PROTOBUF_NOINLINE ::PassedRequest*
 Arena::CreateMaybeMessage< ::PassedRequest >(Arena* arena) {
   return Arena::CreateMessageInternal< ::PassedRequest >(arena);

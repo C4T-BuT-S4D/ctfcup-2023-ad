@@ -1,59 +1,65 @@
 import ky, { HTTPError } from "ky";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-
 export type Credentials = {
   username: string;
   password: string;
 };
 
-let uid: string = '';
-
 type AuthResponse = {
   id: string;
 }
 
-export function useRegister() {
+type ErrorResponse = {
+  error: string;
+}
+
+export function useRegister(errorCallback: Function) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn(credentials: Credentials) {
       return ky.post("/api/register", { json: credentials }).json<AuthResponse>();
     },
-    onError(error) {
-      console.log(`error ${error}`);
-      // return handleMutationError(error, "Registration error", [409]);
+    async onError(error) {
+      let j: ErrorResponse = await error.response.json();
+      errorCallback(`${j.error}`);
+      return;
     },
     onSuccess(data: AuthResponse) {
-      uid = data['id'];
-      console.log(uid);
+      localStorage.setItem('uid', data['id']);
       return queryClient.invalidateQueries({ queryKey: ["stations"] });
     },
   });
 }
 
-export function useLogin() {
+export function useLogin(errorCallback: Function) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn(credentials: Credentials) {
       return ky.post("/api/login", { json: credentials }).json<AuthResponse>();
     },
-    onError(error) {
-      console.log(`error ${error}`);
-      // return handleMutationError(error, "Registration error", [409]);
+    async onError(error) {
+      let j: ErrorResponse = await error.response.json();
+      errorCallback(`${j.error}`);
     },
     onSuccess(data: AuthResponse) {
-      uid = data['id'];
+      localStorage.setItem('uid', data['id']);
       return queryClient.invalidateQueries({ queryKey: ["stations"] });
     },
   });
 }
 
 export function useLogout() {
-  uid = '';
   const queryClient = useQueryClient();
-  return queryClient.invalidateQueries({ queryKey: ["stations"] });
+
+  return useMutation({
+    mutationFn() {
+      localStorage.setItem('uid', '');
+      return queryClient.invalidateQueries({ queryKey: ["stations"] });
+    }
+  });
 }
 
 type UserResponse = {
@@ -64,6 +70,7 @@ type UserResponse = {
 
 export function useUser() {
   return useQuery({queryKey: ["users"], queryFn: async () => {
+    let uid = localStorage.getItem('uid');
     let req: StationsRequest = {uid: uid}
     let res = await ky.post("/api/user", { json: req }).json<UserResponse>();
     return res;
@@ -71,7 +78,7 @@ export function useUser() {
 }
 
 type StationsRequest = {
-  uid: string;
+  uid: string | null;
 }
 
 export type Station = {
@@ -94,6 +101,7 @@ const CELL_SIZE: number = 40;
 
 export function useStations() {
   return useQuery({queryKey: ["stations"], queryFn: async () => {
+    let uid = localStorage.getItem('uid');
     let req: StationsRequest = {uid: uid}
     let stations = await ky.post("/api/stations", { json: req }).json<Station[]>();
     let edges = await ky.post("/api/links", { json: req }).json<Edge[]>();
@@ -109,13 +117,14 @@ export function useStations() {
 }
 
 type RouteRequest = {
-  uid: string;
+  uid: string | null;
   from: number;
   to: number;
 }
 
 export function useRoute(from: number, to: number) {
   return useQuery({queryKey: ["routes"], queryFn: async () => {
+    let uid = localStorage.getItem('uid');
     let req: RouteRequest = {uid: uid, from: from, to: to}
     let route = await ky.post("/api/route", { json: req }).json<number[]>();
     return route;
@@ -131,21 +140,60 @@ export type SendOilRequest = {
   msg: string;
 
 }
-export function useSendOil() {
-  // const queryClient = useQueryClient();
+export function useSendOil(errorCallback: Function) {
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn(req: SendOilRequest) {
       return ky.post("/api/send", { json: req }).json<"">();
     },
-    onError(error) {
-      console.log(`error ${error}`);
-      // return handleMutationError(error, "Registration error", [409]);
-      return '123';
+    async onError(error) {
+      let j: ErrorResponse = await error.response.json();
+      errorCallback(`${j.error}`);
+      return;
     },
     onSuccess() {
-      return '';
-      // return queryClient.invalidateQueries({ queryKey: ["stations"] });
+      return queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
+}
+
+export type AddMoneyRequest = {
+  uid: string;
+  amount: number;
+  station_id: number;
+  oil_id: number;
+}
+
+export function useAddMoney(errorCallback: Function) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn(req: AddMoneyRequest) {
+      return ky.post("/api/add_money", { json: req }).json<"">();
+    },
+    async onError(error) {
+      let j: ErrorResponse = await error.response.json();
+      errorCallback(`${j.error}`);
+      return;
+    },
+    onSuccess() {
+      return queryClient.invalidateQueries({ queryKey: ["received"] });
+    },
+  });
+}
+
+type ReceivedResponse = {
+  sender: string;
+  message: string;
+  station_id: number;
+}
+
+export function useLastReceived() {
+  return useQuery({queryKey: ["received"], queryFn: async () => {
+    let uid = localStorage.getItem('uid');
+    let req: StationsRequest = {uid: uid}
+    let received = await ky.post("/api/last_received", { json: req }).json<ReceivedResponse[]>();
+    return received;
+  }});
 }

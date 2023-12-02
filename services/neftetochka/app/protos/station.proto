@@ -1,7 +1,6 @@
 syntax="proto3";
 
 service MainStation {
-    rpc Info(InfoRequest) returns (None) {}
     rpc Passed(PassedRequest) returns (None) {}
     rpc NoMoney(NoMoneyRequest) returns (None) {}
     rpc GetOil(GetOilRequest) returns (None) {}
@@ -16,15 +15,11 @@ enum Status {
     INVALID_OIL_ID = 5;
 }
 
-message InfoRequest {
-    Status code = 1;
-    string message = 2;
-}
-
 message PassedRequest {
     string uid = 1;
     string receiver_id = 2;
     int64 station_id = 3;
+    int64 money = 4;
 }
 
 message NoMoneyRequest {
@@ -32,12 +27,14 @@ message NoMoneyRequest {
     string receiver_id = 2;
     int64 station_id = 3;
     int64 oil_id = 4;
+    int64 money = 5;
 }
 
 message GetOilRequest {
     string uid = 1;
     string msg = 2;
     string receiver_id = 3;
+    int64 station_id = 4;
 }
 
 service Station {

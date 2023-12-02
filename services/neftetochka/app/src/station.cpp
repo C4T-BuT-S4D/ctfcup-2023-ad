@@ -11,8 +11,6 @@
 
 #include "station_client.h"
 
-// #include "station.hpp"
-
 using google::protobuf::RepeatedField;
 using grpc::Channel;
 using grpc::Server;
@@ -54,17 +52,18 @@ class MainStationClient {
         stub_ = MainStation::NewStub(channel);
     }    
 
-    void Passed(string uid, string receiver_id) {
+    void Passed(string uid, string receiver_id, int money) {
         ClientContext context;
         PassedRequest req;
         None resp;
         req.set_uid(uid);
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
+        req.set_money(money);
         stub_->Passed(&context, req, &resp);
     }
 
-    void NoMoney(string uid, string receiver_id, int oil_id) {
+    void NoMoney(string uid, string receiver_id, int oil_id, int money) {
         ClientContext context;
         NoMoneyRequest req;
         None resp;
@@ -72,6 +71,7 @@ class MainStationClient {
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
         req.set_oil_id(oil_id);
+        req.set_money(money);
         stub_->NoMoney(&context, req, &resp);
     }
 
@@ -82,6 +82,7 @@ class MainStationClient {
         req.set_uid(uid);
         req.set_msg(msg);
         req.set_receiver_id(receiver_id);
+        req.set_station_id(port);
         stub_->GetOil(&context, req, &resp);
     }
 };
@@ -105,11 +106,11 @@ class StationImpl final : public Station::Service {
             //     out_of_money.push_back(oil);
             // }
 
-            MainStationClient().NoMoney(oil.uid, oil.receiver_id, oil_id);
+            MainStationClient().NoMoney(oil.uid, oil.receiver_id, oil_id, oil.money);
         }
         else if (oil.route.size() > 1) {
             int next = oil.route[oil.route.size() - 2];
-            MainStationClient().Passed(oil.uid, oil.receiver_id);
+            MainStationClient().Passed(oil.uid, oil.receiver_id, oil.money);
             StationClient(next).SendOil(oil.uid, oil.receiver_id, oil.msg, oil.money, oil.route);
             return;
         }
@@ -161,105 +162,15 @@ class StationImpl final : public Station::Service {
         //     return grpc::Status::OK;
         // }
         out_of_money[oil_id].money += req->amount();
-        if (out_of_money[oil_id].money >= 0) {
-            // removed.insert(oil_id);
-            send_oil(out_of_money[oil_id]);
-        }
+        send_oil(out_of_money[oil_id]);
+        // if (out_of_money[oil_id].money >= 0) {
+        //     // removed.insert(oil_id);
+        // }
 
         return grpc::Status::OK;
     }
 };
 
-/*
-void do_send_oil(const Oil &oil) {
-    if (oil.balance < 0) {
-        int oil_id = 0;
-        if (!removed.empty()) {
-            oil_id = *removed.begin();
-            removed.erase(removed.begin());
-            out_of_money[oil_id] = oil;
-        }
-        else {
-            oil_id = out_of_money.size();
-            out_of_money.push_back(oil);
-        }
-
-        SocketResponse res(NO_MONEY, port, oil_id, oil.uid);
-        send_to_main_server(res);
-        cout << "[STATION " << port << "] send NO_MONEY\n";
-    }
-    else if (oil.remaining_route.size() > 1) {
-        int next_station_id = oil.remaining_route[oil.remaining_route.size()-2];
-        int station_fd = connect_to(stations[next_station_id].port);
-        send_oil(station_fd, oil);
-        close(station_fd);
-
-        SocketResponse res(PASS, port, oil.uid);
-        send_to_main_server(res);
-        cout << "[STATION " << port << "] send PASS to station " << next_station_id << "\n";
-    }
-    else {
-        int oil_id = to_receive.size();
-        to_receive.push_back(oil);
-
-        SocketResponse res(READY, port, oil_id, oil.uid);
-        send_to_main_server(res);
-        cout << "[STATION " << port << "] send READY\n";
-    }
-}
-
-void SendOil(int fd) {
-    Oil oil;
-    read(fd, &oil.balance, sizeof(oil.balance));
-    read(fd, &oil.uid, sizeof(oil.uid));
-    int n;
-    read(fd, &n, sizeof(n));
-    for (int i = 0; i < n; ++i) {
-        int id;
-        read(fd, &id, sizeof(id));
-        oil.remaining_route.push_back(id);
-    }
-    status res = OK;
-    write(fd, &res, sizeof(res));
-    close(fd);
-
-    cout << "[STATION " << port << "] received " << oil << "\n";
-
-    if (oil.remaining_route.back() != port) {
-        oil.balance -= stations[oil.remaining_route.back()].cost;
-        oil.remaining_route.pop_back();
-    }
-    cout << "[STATION " << port << "] now oil is " << oil << "\n";
-
-    do_send_oil(oil);
-    
-}
-
-void AddMoney(int fd) {
-    int oil_id, balance;
-    read(fd, &oil_id, sizeof(oil_id));
-    read(fd, &balance, sizeof(balance));
-    int n = out_of_money.size();
-    if (oil_id >= n || removed.find(oil_id) != removed.end()) {
-        status res = INVALID_OIL_ID;
-        write(fd, &res, sizeof(res));
-        close(fd);
-        return;
-    }
-    status res = OK;
-    write(fd, &res, sizeof(res));
-    close(fd);
-
-    out_of_money[oil_id].balance += balance;
-    if (out_of_money[oil_id].balance >= 0) {
-        removed.insert(oil_id);
-        Oil oil = out_of_money[oil_id];
-        do_send_oil(oil);
-    }
-
-}
-
-*/
 int main(int /*argc*/, char **argv, char **/*env*/) {
     string port = argv[1];
 

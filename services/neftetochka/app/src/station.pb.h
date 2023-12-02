@@ -52,9 +52,6 @@ extern AddMoneyRequestDefaultTypeInternal _AddMoneyRequest_default_instance_;
 class GetOilRequest;
 struct GetOilRequestDefaultTypeInternal;
 extern GetOilRequestDefaultTypeInternal _GetOilRequest_default_instance_;
-class InfoRequest;
-struct InfoRequestDefaultTypeInternal;
-extern InfoRequestDefaultTypeInternal _InfoRequest_default_instance_;
 class InitRequest;
 struct InitRequestDefaultTypeInternal;
 extern InitRequestDefaultTypeInternal _InitRequest_default_instance_;
@@ -76,7 +73,6 @@ extern SendOilRequestDefaultTypeInternal _SendOilRequest_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::AddMoneyRequest* Arena::CreateMaybeMessage<::AddMoneyRequest>(Arena*);
 template<> ::GetOilRequest* Arena::CreateMaybeMessage<::GetOilRequest>(Arena*);
-template<> ::InfoRequest* Arena::CreateMaybeMessage<::InfoRequest>(Arena*);
 template<> ::InitRequest* Arena::CreateMaybeMessage<::InitRequest>(Arena*);
 template<> ::LinkRequest* Arena::CreateMaybeMessage<::LinkRequest>(Arena*);
 template<> ::NoMoneyRequest* Arena::CreateMaybeMessage<::NoMoneyRequest>(Arena*);
@@ -115,170 +111,6 @@ inline bool Status_Parse(
     Status_descriptor(), name, value);
 }
 // ===================================================================
-
-class InfoRequest final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:InfoRequest) */ {
- public:
-  inline InfoRequest() : InfoRequest(nullptr) {}
-  ~InfoRequest() override;
-  explicit PROTOBUF_CONSTEXPR InfoRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  InfoRequest(const InfoRequest& from);
-  InfoRequest(InfoRequest&& from) noexcept
-    : InfoRequest() {
-    *this = ::std::move(from);
-  }
-
-  inline InfoRequest& operator=(const InfoRequest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline InfoRequest& operator=(InfoRequest&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()
-  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
-        && GetOwningArena() != nullptr
-  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
-    ) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const InfoRequest& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const InfoRequest* internal_default_instance() {
-    return reinterpret_cast<const InfoRequest*>(
-               &_InfoRequest_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    0;
-
-  friend void swap(InfoRequest& a, InfoRequest& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(InfoRequest* other) {
-    if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(InfoRequest* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  InfoRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<InfoRequest>(arena);
-  }
-  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const InfoRequest& from);
-  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom( const InfoRequest& from) {
-    InfoRequest::MergeImpl(*this, from);
-  }
-  private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-  public:
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  uint8_t* _InternalSerialize(
-      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
-
-  private:
-  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(InfoRequest* other);
-
-  private:
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "InfoRequest";
-  }
-  protected:
-  explicit InfoRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                       bool is_message_owned = false);
-  public:
-
-  static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kMessageFieldNumber = 2,
-    kCodeFieldNumber = 1,
-  };
-  // string message = 2;
-  void clear_message();
-  const std::string& message() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_message(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_message();
-  PROTOBUF_NODISCARD std::string* release_message();
-  void set_allocated_message(std::string* message);
-  private:
-  const std::string& _internal_message() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_message(const std::string& value);
-  std::string* _internal_mutable_message();
-  public:
-
-  // .Status code = 1;
-  void clear_code();
-  ::Status code() const;
-  void set_code(::Status value);
-  private:
-  ::Status _internal_code() const;
-  void _internal_set_code(::Status value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:InfoRequest)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr message_;
-    int code_;
-    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  };
-  union { Impl_ _impl_; };
-  friend struct ::TableStruct_station_2eproto;
-};
-// -------------------------------------------------------------------
 
 class PassedRequest final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:PassedRequest) */ {
@@ -328,7 +160,7 @@ class PassedRequest final :
                &_PassedRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    0;
 
   friend void swap(PassedRequest& a, PassedRequest& b) {
     a.Swap(&b);
@@ -404,6 +236,7 @@ class PassedRequest final :
     kUidFieldNumber = 1,
     kReceiverIdFieldNumber = 2,
     kStationIdFieldNumber = 3,
+    kMoneyFieldNumber = 4,
   };
   // string uid = 1;
   void clear_uid();
@@ -442,6 +275,15 @@ class PassedRequest final :
   void _internal_set_station_id(int64_t value);
   public:
 
+  // int64 money = 4;
+  void clear_money();
+  int64_t money() const;
+  void set_money(int64_t value);
+  private:
+  int64_t _internal_money() const;
+  void _internal_set_money(int64_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:PassedRequest)
  private:
   class _Internal;
@@ -453,6 +295,7 @@ class PassedRequest final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uid_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr receiver_id_;
     int64_t station_id_;
+    int64_t money_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -508,7 +351,7 @@ class NoMoneyRequest final :
                &_NoMoneyRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    1;
 
   friend void swap(NoMoneyRequest& a, NoMoneyRequest& b) {
     a.Swap(&b);
@@ -585,6 +428,7 @@ class NoMoneyRequest final :
     kReceiverIdFieldNumber = 2,
     kStationIdFieldNumber = 3,
     kOilIdFieldNumber = 4,
+    kMoneyFieldNumber = 5,
   };
   // string uid = 1;
   void clear_uid();
@@ -632,6 +476,15 @@ class NoMoneyRequest final :
   void _internal_set_oil_id(int64_t value);
   public:
 
+  // int64 money = 5;
+  void clear_money();
+  int64_t money() const;
+  void set_money(int64_t value);
+  private:
+  int64_t _internal_money() const;
+  void _internal_set_money(int64_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:NoMoneyRequest)
  private:
   class _Internal;
@@ -644,6 +497,7 @@ class NoMoneyRequest final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr receiver_id_;
     int64_t station_id_;
     int64_t oil_id_;
+    int64_t money_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -699,7 +553,7 @@ class GetOilRequest final :
                &_GetOilRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   friend void swap(GetOilRequest& a, GetOilRequest& b) {
     a.Swap(&b);
@@ -775,6 +629,7 @@ class GetOilRequest final :
     kUidFieldNumber = 1,
     kMsgFieldNumber = 2,
     kReceiverIdFieldNumber = 3,
+    kStationIdFieldNumber = 4,
   };
   // string uid = 1;
   void clear_uid();
@@ -818,6 +673,15 @@ class GetOilRequest final :
   std::string* _internal_mutable_receiver_id();
   public:
 
+  // int64 station_id = 4;
+  void clear_station_id();
+  int64_t station_id() const;
+  void set_station_id(int64_t value);
+  private:
+  int64_t _internal_station_id() const;
+  void _internal_set_station_id(int64_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:GetOilRequest)
  private:
   class _Internal;
@@ -829,6 +693,7 @@ class GetOilRequest final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uid_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr receiver_id_;
+    int64_t station_id_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -884,7 +749,7 @@ class InitRequest final :
                &_InitRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    3;
 
   friend void swap(InitRequest& a, InitRequest& b) {
     a.Swap(&b);
@@ -1054,7 +919,7 @@ class LinkRequest final :
                &_LinkRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   friend void swap(LinkRequest& a, LinkRequest& b) {
     a.Swap(&b);
@@ -1213,7 +1078,7 @@ class SendOilRequest final :
                &_SendOilRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   friend void swap(SendOilRequest& a, SendOilRequest& b) {
     a.Swap(&b);
@@ -1434,7 +1299,7 @@ class AddMoneyRequest final :
                &_AddMoneyRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   friend void swap(AddMoneyRequest& a, AddMoneyRequest& b) {
     a.Swap(&b);
@@ -1592,7 +1457,7 @@ class None final :
                &_None_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   friend void swap(None& a, None& b) {
     a.Swap(&b);
@@ -1670,80 +1535,6 @@ class None final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// InfoRequest
-
-// .Status code = 1;
-inline void InfoRequest::clear_code() {
-  _impl_.code_ = 0;
-}
-inline ::Status InfoRequest::_internal_code() const {
-  return static_cast< ::Status >(_impl_.code_);
-}
-inline ::Status InfoRequest::code() const {
-  // @@protoc_insertion_point(field_get:InfoRequest.code)
-  return _internal_code();
-}
-inline void InfoRequest::_internal_set_code(::Status value) {
-  
-  _impl_.code_ = value;
-}
-inline void InfoRequest::set_code(::Status value) {
-  _internal_set_code(value);
-  // @@protoc_insertion_point(field_set:InfoRequest.code)
-}
-
-// string message = 2;
-inline void InfoRequest::clear_message() {
-  _impl_.message_.ClearToEmpty();
-}
-inline const std::string& InfoRequest::message() const {
-  // @@protoc_insertion_point(field_get:InfoRequest.message)
-  return _internal_message();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void InfoRequest::set_message(ArgT0&& arg0, ArgT... args) {
- 
- _impl_.message_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:InfoRequest.message)
-}
-inline std::string* InfoRequest::mutable_message() {
-  std::string* _s = _internal_mutable_message();
-  // @@protoc_insertion_point(field_mutable:InfoRequest.message)
-  return _s;
-}
-inline const std::string& InfoRequest::_internal_message() const {
-  return _impl_.message_.Get();
-}
-inline void InfoRequest::_internal_set_message(const std::string& value) {
-  
-  _impl_.message_.Set(value, GetArenaForAllocation());
-}
-inline std::string* InfoRequest::_internal_mutable_message() {
-  
-  return _impl_.message_.Mutable(GetArenaForAllocation());
-}
-inline std::string* InfoRequest::release_message() {
-  // @@protoc_insertion_point(field_release:InfoRequest.message)
-  return _impl_.message_.Release();
-}
-inline void InfoRequest::set_allocated_message(std::string* message) {
-  if (message != nullptr) {
-    
-  } else {
-    
-  }
-  _impl_.message_.SetAllocated(message, GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.message_.IsDefault()) {
-    _impl_.message_.Set("", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:InfoRequest.message)
-}
-
-// -------------------------------------------------------------------
-
 // PassedRequest
 
 // string uid = 1;
@@ -1864,6 +1655,26 @@ inline void PassedRequest::_internal_set_station_id(int64_t value) {
 inline void PassedRequest::set_station_id(int64_t value) {
   _internal_set_station_id(value);
   // @@protoc_insertion_point(field_set:PassedRequest.station_id)
+}
+
+// int64 money = 4;
+inline void PassedRequest::clear_money() {
+  _impl_.money_ = int64_t{0};
+}
+inline int64_t PassedRequest::_internal_money() const {
+  return _impl_.money_;
+}
+inline int64_t PassedRequest::money() const {
+  // @@protoc_insertion_point(field_get:PassedRequest.money)
+  return _internal_money();
+}
+inline void PassedRequest::_internal_set_money(int64_t value) {
+  
+  _impl_.money_ = value;
+}
+inline void PassedRequest::set_money(int64_t value) {
+  _internal_set_money(value);
+  // @@protoc_insertion_point(field_set:PassedRequest.money)
 }
 
 // -------------------------------------------------------------------
@@ -2008,6 +1819,26 @@ inline void NoMoneyRequest::_internal_set_oil_id(int64_t value) {
 inline void NoMoneyRequest::set_oil_id(int64_t value) {
   _internal_set_oil_id(value);
   // @@protoc_insertion_point(field_set:NoMoneyRequest.oil_id)
+}
+
+// int64 money = 5;
+inline void NoMoneyRequest::clear_money() {
+  _impl_.money_ = int64_t{0};
+}
+inline int64_t NoMoneyRequest::_internal_money() const {
+  return _impl_.money_;
+}
+inline int64_t NoMoneyRequest::money() const {
+  // @@protoc_insertion_point(field_get:NoMoneyRequest.money)
+  return _internal_money();
+}
+inline void NoMoneyRequest::_internal_set_money(int64_t value) {
+  
+  _impl_.money_ = value;
+}
+inline void NoMoneyRequest::set_money(int64_t value) {
+  _internal_set_money(value);
+  // @@protoc_insertion_point(field_set:NoMoneyRequest.money)
 }
 
 // -------------------------------------------------------------------
@@ -2162,6 +1993,26 @@ inline void GetOilRequest::set_allocated_receiver_id(std::string* receiver_id) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:GetOilRequest.receiver_id)
+}
+
+// int64 station_id = 4;
+inline void GetOilRequest::clear_station_id() {
+  _impl_.station_id_ = int64_t{0};
+}
+inline int64_t GetOilRequest::_internal_station_id() const {
+  return _impl_.station_id_;
+}
+inline int64_t GetOilRequest::station_id() const {
+  // @@protoc_insertion_point(field_get:GetOilRequest.station_id)
+  return _internal_station_id();
+}
+inline void GetOilRequest::_internal_set_station_id(int64_t value) {
+  
+  _impl_.station_id_ = value;
+}
+inline void GetOilRequest::set_station_id(int64_t value) {
+  _internal_set_station_id(value);
+  // @@protoc_insertion_point(field_set:GetOilRequest.station_id)
 }
 
 // -------------------------------------------------------------------
@@ -2544,8 +2395,6 @@ inline void AddMoneyRequest::set_oil_id(int32_t value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -17,6 +17,15 @@ CREATE TABLE IF NOT EXISTS links (
     CONSTRAINT port1_port2_pkey PRIMARY KEY (port1, port2)
 );
 
+CREATE TABLE IF NOT EXISTS oil (
+    id          VARCHAR(32) PRIMARY KEY,
+    sender_id   VARCHAR(32) REFERENCES users(id),
+    receiver_id VARCHAR(32) REFERENCES users(id),
+    message     VARCHAR(100),
+    station_id  INTEGER,
+    time        INTEGER
+);
+
 INSERT INTO stations (port, x, y) values
     (16001,  1,  2),
     (16002,  3,  5),
@@ -92,9 +101,3 @@ INSERT INTO links (port1, port2) values
     (16012, 16034),
     (16033, 16022),
     (16033, 16031);
-
--- CREATE TABLE IF NOT EXISTS oil (
---     id          VARCHAR(32) PRIMARY KEY,
---     cur_station VARCHAR(32) REFERENCES stations(id),
---     balance     INTEGER
--- );

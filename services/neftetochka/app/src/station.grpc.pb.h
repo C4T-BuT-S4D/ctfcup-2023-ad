@@ -33,13 +33,6 @@ class MainStation final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status Info(::grpc::ClientContext* context, const ::InfoRequest& request, ::None* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> AsyncInfo(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(AsyncInfoRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> PrepareAsyncInfo(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(PrepareAsyncInfoRaw(context, request, cq));
-    }
     virtual ::grpc::Status Passed(::grpc::ClientContext* context, const ::PassedRequest& request, ::None* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> AsyncPassed(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(AsyncPassedRaw(context, request, cq));
@@ -64,8 +57,6 @@ class MainStation final {
     class async_interface {
      public:
       virtual ~async_interface() {}
-      virtual void Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Passed(::grpc::ClientContext* context, const ::PassedRequest* request, ::None* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Passed(::grpc::ClientContext* context, const ::PassedRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void NoMoney(::grpc::ClientContext* context, const ::NoMoneyRequest* request, ::None* response, std::function<void(::grpc::Status)>) = 0;
@@ -77,8 +68,6 @@ class MainStation final {
     virtual class async_interface* async() { return nullptr; }
     class async_interface* experimental_async() { return async(); }
    private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* AsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* PrepareAsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* AsyncPassedRaw(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* PrepareAsyncPassedRaw(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* AsyncNoMoneyRaw(::grpc::ClientContext* context, const ::NoMoneyRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -89,13 +78,6 @@ class MainStation final {
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
-    ::grpc::Status Info(::grpc::ClientContext* context, const ::InfoRequest& request, ::None* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> AsyncInfo(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(AsyncInfoRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> PrepareAsyncInfo(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(PrepareAsyncInfoRaw(context, request, cq));
-    }
     ::grpc::Status Passed(::grpc::ClientContext* context, const ::PassedRequest& request, ::None* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> AsyncPassed(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(AsyncPassedRaw(context, request, cq));
@@ -120,8 +102,6 @@ class MainStation final {
     class async final :
       public StubInterface::async_interface {
      public:
-      void Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, std::function<void(::grpc::Status)>) override;
-      void Info(::grpc::ClientContext* context, const ::InfoRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Passed(::grpc::ClientContext* context, const ::PassedRequest* request, ::None* response, std::function<void(::grpc::Status)>) override;
       void Passed(::grpc::ClientContext* context, const ::PassedRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) override;
       void NoMoney(::grpc::ClientContext* context, const ::NoMoneyRequest* request, ::None* response, std::function<void(::grpc::Status)>) override;
@@ -139,15 +119,12 @@ class MainStation final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::None>* AsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncInfoRaw(::grpc::ClientContext* context, const ::InfoRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* AsyncPassedRaw(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncPassedRaw(::grpc::ClientContext* context, const ::PassedRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* AsyncNoMoneyRaw(::grpc::ClientContext* context, const ::NoMoneyRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncNoMoneyRaw(::grpc::ClientContext* context, const ::NoMoneyRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* AsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_Info_;
     const ::grpc::internal::RpcMethod rpcmethod_Passed_;
     const ::grpc::internal::RpcMethod rpcmethod_NoMoney_;
     const ::grpc::internal::RpcMethod rpcmethod_GetOil_;
@@ -158,30 +135,9 @@ class MainStation final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status Info(::grpc::ServerContext* context, const ::InfoRequest* request, ::None* response);
     virtual ::grpc::Status Passed(::grpc::ServerContext* context, const ::PassedRequest* request, ::None* response);
     virtual ::grpc::Status NoMoney(::grpc::ServerContext* context, const ::NoMoneyRequest* request, ::None* response);
     virtual ::grpc::Status GetOil(::grpc::ServerContext* context, const ::GetOilRequest* request, ::None* response);
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_Info() {
-      ::grpc::Service::MarkMethodAsync(0);
-    }
-    ~WithAsyncMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestInfo(::grpc::ServerContext* context, ::InfoRequest* request, ::grpc::ServerAsyncResponseWriter< ::None>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
   };
   template <class BaseClass>
   class WithAsyncMethod_Passed : public BaseClass {
@@ -189,7 +145,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Passed() {
-      ::grpc::Service::MarkMethodAsync(1);
+      ::grpc::Service::MarkMethodAsync(0);
     }
     ~WithAsyncMethod_Passed() override {
       BaseClassMustBeDerivedFromService(this);
@@ -200,7 +156,7 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestPassed(::grpc::ServerContext* context, ::PassedRequest* request, ::grpc::ServerAsyncResponseWriter< ::None>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -209,7 +165,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_NoMoney() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(1);
     }
     ~WithAsyncMethod_NoMoney() override {
       BaseClassMustBeDerivedFromService(this);
@@ -220,7 +176,7 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestNoMoney(::grpc::ServerContext* context, ::NoMoneyRequest* request, ::grpc::ServerAsyncResponseWriter< ::None>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -229,7 +185,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_GetOil() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(2);
     }
     ~WithAsyncMethod_GetOil() override {
       BaseClassMustBeDerivedFromService(this);
@@ -240,50 +196,23 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetOil(::grpc::ServerContext* context, ::GetOilRequest* request, ::grpc::ServerAsyncResponseWriter< ::None>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Info<WithAsyncMethod_Passed<WithAsyncMethod_NoMoney<WithAsyncMethod_GetOil<Service > > > > AsyncService;
-  template <class BaseClass>
-  class WithCallbackMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_Info() {
-      ::grpc::Service::MarkMethodCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::InfoRequest, ::None>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::InfoRequest* request, ::None* response) { return this->Info(context, request, response); }));}
-    void SetMessageAllocatorFor_Info(
-        ::grpc::MessageAllocator< ::InfoRequest, ::None>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::InfoRequest, ::None>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* Info(
-      ::grpc::CallbackServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/)  { return nullptr; }
-  };
+  typedef WithAsyncMethod_Passed<WithAsyncMethod_NoMoney<WithAsyncMethod_GetOil<Service > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Passed : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_Passed() {
-      ::grpc::Service::MarkMethodCallback(1,
+      ::grpc::Service::MarkMethodCallback(0,
           new ::grpc::internal::CallbackUnaryHandler< ::PassedRequest, ::None>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::PassedRequest* request, ::None* response) { return this->Passed(context, request, response); }));}
     void SetMessageAllocatorFor_Passed(
         ::grpc::MessageAllocator< ::PassedRequest, ::None>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::PassedRequest, ::None>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -304,13 +233,13 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_NoMoney() {
-      ::grpc::Service::MarkMethodCallback(2,
+      ::grpc::Service::MarkMethodCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::NoMoneyRequest, ::None>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::NoMoneyRequest* request, ::None* response) { return this->NoMoney(context, request, response); }));}
     void SetMessageAllocatorFor_NoMoney(
         ::grpc::MessageAllocator< ::NoMoneyRequest, ::None>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::NoMoneyRequest, ::None>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -331,13 +260,13 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_GetOil() {
-      ::grpc::Service::MarkMethodCallback(3,
+      ::grpc::Service::MarkMethodCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::GetOilRequest, ::None>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::GetOilRequest* request, ::None* response) { return this->GetOil(context, request, response); }));}
     void SetMessageAllocatorFor_GetOil(
         ::grpc::MessageAllocator< ::GetOilRequest, ::None>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::GetOilRequest, ::None>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -352,32 +281,15 @@ class MainStation final {
     virtual ::grpc::ServerUnaryReactor* GetOil(
       ::grpc::CallbackServerContext* /*context*/, const ::GetOilRequest* /*request*/, ::None* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_Info<WithCallbackMethod_Passed<WithCallbackMethod_NoMoney<WithCallbackMethod_GetOil<Service > > > > CallbackService;
+  typedef WithCallbackMethod_Passed<WithCallbackMethod_NoMoney<WithCallbackMethod_GetOil<Service > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
-  template <class BaseClass>
-  class WithGenericMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_Info() {
-      ::grpc::Service::MarkMethodGeneric(0);
-    }
-    ~WithGenericMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
   template <class BaseClass>
   class WithGenericMethod_Passed : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Passed() {
-      ::grpc::Service::MarkMethodGeneric(1);
+      ::grpc::Service::MarkMethodGeneric(0);
     }
     ~WithGenericMethod_Passed() override {
       BaseClassMustBeDerivedFromService(this);
@@ -394,7 +306,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_NoMoney() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(1);
     }
     ~WithGenericMethod_NoMoney() override {
       BaseClassMustBeDerivedFromService(this);
@@ -411,7 +323,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_GetOil() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(2);
     }
     ~WithGenericMethod_GetOil() override {
       BaseClassMustBeDerivedFromService(this);
@@ -423,32 +335,12 @@ class MainStation final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_Info() {
-      ::grpc::Service::MarkMethodRaw(0);
-    }
-    ~WithRawMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestInfo(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithRawMethod_Passed : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Passed() {
-      ::grpc::Service::MarkMethodRaw(1);
+      ::grpc::Service::MarkMethodRaw(0);
     }
     ~WithRawMethod_Passed() override {
       BaseClassMustBeDerivedFromService(this);
@@ -459,7 +351,7 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestPassed(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -468,7 +360,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_NoMoney() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(1);
     }
     ~WithRawMethod_NoMoney() override {
       BaseClassMustBeDerivedFromService(this);
@@ -479,7 +371,7 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestNoMoney(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -488,7 +380,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_GetOil() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(2);
     }
     ~WithRawMethod_GetOil() override {
       BaseClassMustBeDerivedFromService(this);
@@ -499,30 +391,8 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetOil(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
-  };
-  template <class BaseClass>
-  class WithRawCallbackMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_Info() {
-      ::grpc::Service::MarkMethodRawCallback(0,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Info(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* Info(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithRawCallbackMethod_Passed : public BaseClass {
@@ -530,7 +400,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_Passed() {
-      ::grpc::Service::MarkMethodRawCallback(1,
+      ::grpc::Service::MarkMethodRawCallback(0,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Passed(context, request, response); }));
@@ -552,7 +422,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_NoMoney() {
-      ::grpc::Service::MarkMethodRawCallback(2,
+      ::grpc::Service::MarkMethodRawCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->NoMoney(context, request, response); }));
@@ -574,7 +444,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_GetOil() {
-      ::grpc::Service::MarkMethodRawCallback(3,
+      ::grpc::Service::MarkMethodRawCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->GetOil(context, request, response); }));
@@ -591,39 +461,12 @@ class MainStation final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_Info : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithStreamedUnaryMethod_Info() {
-      ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::InfoRequest, ::None>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::InfoRequest, ::None>* streamer) {
-                       return this->StreamedInfo(context,
-                         streamer);
-                  }));
-    }
-    ~WithStreamedUnaryMethod_Info() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status Info(::grpc::ServerContext* /*context*/, const ::InfoRequest* /*request*/, ::None* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedInfo(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::InfoRequest,::None>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
   class WithStreamedUnaryMethod_Passed : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Passed() {
-      ::grpc::Service::MarkMethodStreamed(1,
+      ::grpc::Service::MarkMethodStreamed(0,
         new ::grpc::internal::StreamedUnaryHandler<
           ::PassedRequest, ::None>(
             [this](::grpc::ServerContext* context,
@@ -650,7 +493,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_NoMoney() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
           ::NoMoneyRequest, ::None>(
             [this](::grpc::ServerContext* context,
@@ -677,7 +520,7 @@ class MainStation final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_GetOil() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(2,
         new ::grpc::internal::StreamedUnaryHandler<
           ::GetOilRequest, ::None>(
             [this](::grpc::ServerContext* context,
@@ -698,9 +541,9 @@ class MainStation final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGetOil(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::GetOilRequest,::None>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Info<WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Info<WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > StreamedService;
 };
 
 class Station final {
