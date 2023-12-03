@@ -1,1 +1,3 @@
 checklib
+grpcio
+protobuf
