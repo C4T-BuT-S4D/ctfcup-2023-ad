@@ -137,7 +137,6 @@ class CheckMachine:
         ws.send(json.dumps({"type":"INIT", "uid":uid}))
         resp = self.get_websocket_json(ws)
         if resp.get("data") != "ok":
-            print(resp)
             self.c.cquit(Status.MUMBLE, "Invalid response on websocket init")
 
     def send_oil(self, session: requests.Session, uid: str, receiver_id: str, msg: str, money: int, fr: int, to: int, status: Status) -> None:

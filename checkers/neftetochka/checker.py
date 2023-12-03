@@ -2,6 +2,7 @@
 
 import math
 import sys
+import time
 import random
 import requests
 
@@ -208,6 +209,7 @@ class Checker(BaseChecker):
     def _send_oil(self, session: requests.Session, sender_uid: str, receiver_uid: str, msg: str, money: int, fr: int, to: int) -> None:
         expected_ans = self._calc_expected_ans(fr, to, money)[::-1]
         ws = self.mch.get_websocket()
+        time.sleep(1)
         self.mch.init_websocket(ws, sender_uid)
         self.mch.send_oil(session, sender_uid, receiver_uid, msg, money, fr, to, Status.MUMBLE)
 
@@ -226,19 +228,10 @@ class Checker(BaseChecker):
             if ans["type"] == NO_MONEY:
                 self.assert_eq(resp.get("money"), ans["money"], "Invalid response from websocket while sending oil")
                 self.assert_eq(type(resp.get("oil_id")), int, "Invalid response from websocket while sending oil")
-                amount = random.randint(5, 20)
+                amount = random.randint(1, 20)
                 self.mch.add_money(session, sender_uid, amount, resp.get("station_id"), resp.get("oil_id"), Status.MUMBLE)
                 money = resp.get("money") + amount
                 expected_ans = self._calc_expected_ans(resp.get("station_id"), to, money)[::-1]
-
-    def no_webs(self, session: requests.Session, uid1: str, uid2: str, msg: str, fr: int, to: int, cost: int):
-        money = cost + random.randint(1, 10)
-        self.mch.send_oil(session, uid1, uid2, msg, money, fr, to, Status.MUMBLE)
-
-    def webs(self, session: requests.Session, uid1: str, uid2: str, msg: str, fr: int, to: int, cost: int):
-        money = cost - random.randint(0, min(cost-1, 10))
-        # money = cost + random.randint(0, min(cost-1, 10))
-        self._send_oil(session, uid1, uid2, msg, money, fr, to)
 
     def check(self):
         session = get_initialized_session()
@@ -267,10 +260,9 @@ class Checker(BaseChecker):
         uid2 = self.mch.register(session, rnd_username(8), rnd_password(), Status.MUMBLE)
 
         msg = rnd_string(random.randint(5, 40))
-        cost = self._get_route_cost(route)
+        money = random.randint(1, 20)
 
-        random.choice([self.no_webs, self.webs])(session, uid1, uid2, msg, fr, to, cost)
-
+        self._send_oil(session, uid1, uid2, msg, money, fr, to)
 
         session = get_initialized_session()
         received = self.mch.get_last_received_oil(session, uid2, Status.MUMBLE)
@@ -288,11 +280,10 @@ class Checker(BaseChecker):
         receiver = self.mch.register(session, rnd_username(8), rnd_password(), Status.MUMBLE)
 
         fr, to = self._get_fr_to()
-        route = self.mch.get_route(session, sender, fr, to, Status.CORRUPT)
-        cost = self._get_route_cost(route)
+        self.mch.get_route(session, sender, fr, to, Status.CORRUPT)
+        money = random.randint(1, 20)
 
-        # self.no_webs(session, sender, receiver, flag, fr, to, cost)
-        self.webs(session, sender, receiver, flag, fr, to, cost)
+        self._send_oil(session, sender, receiver, flag, money, fr, to)
 
         self.cquit(Status.OK, '', f'{receiver}')
 

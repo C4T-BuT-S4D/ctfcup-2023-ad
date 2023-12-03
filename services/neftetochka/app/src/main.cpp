@@ -441,10 +441,12 @@ crow::response LastReceived(const crow::request &req) {
 
 map<crow::websocket::connection*, string> connection_user;
 map<string, set<crow::websocket::connection*>> user_connections;
+mutex mtx;
 
 class MainStationImpl final : public MainStation::Service {
     public:
     grpc::Status Passed(ServerContext *, const PassedRequest *req, None *) override {
+        lock_guard<mutex> _(mtx);
         auto resp = crow::json::wvalue();
         resp["type"] = "passed";
         resp["receiver_id"] = req->receiver_id();
@@ -457,6 +459,7 @@ class MainStationImpl final : public MainStation::Service {
     }
 
     grpc::Status NoMoney(ServerContext *, const NoMoneyRequest *req, None *) override {
+        lock_guard<mutex> _(mtx);
         auto resp = crow::json::wvalue();
         resp["type"] = "no_money";
         resp["receiver_id"] = req->receiver_id();
@@ -470,6 +473,7 @@ class MainStationImpl final : public MainStation::Service {
     }
 
     grpc::Status GetOil(ServerContext *, const GetOilRequest *req, None *) override {
+        lock_guard<mutex> _(mtx);
         auto resp = crow::json::wvalue();
         resp["type"] = "get";
         resp["receiver_id"] = req->receiver_id();
@@ -523,7 +527,6 @@ int main() {
     pthread_create(&healthcheck_thread, NULL, healthcheck, NULL);
 
     crow::SimpleApp app;
-    mutex mtx;
 
     CROW_ROUTE(app, "/register").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
@@ -571,8 +574,7 @@ int main() {
         });
 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
-        .onclose([&mtx](crow::websocket::connection &conn, const string &reason){
-            CROW_LOG_INFO << "websocket connection closing, reason: " << reason;
+        .onclose([&](crow::websocket::connection &conn, const string &reason){
             lock_guard<mutex> _(mtx);
             if (connection_user.find(&conn) != connection_user.end()) {
                 string uid = connection_user[&conn];
@@ -580,8 +582,7 @@ int main() {
                 connection_user.erase(&conn);
             }
         })
-        .onmessage([&mtx](crow::websocket::connection &conn, const string &data, bool /*is_binary*/) {
-            CROW_LOG_INFO << "websocket onmessage";
+        .onmessage([&](crow::websocket::connection &conn, const string &data, bool /*is_binary*/) {
             lock_guard<mutex> _(mtx);
             try {
                 auto json = crow::json::load(data);
