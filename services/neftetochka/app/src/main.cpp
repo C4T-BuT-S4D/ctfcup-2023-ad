@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "station_client.h"
 
@@ -20,7 +20,7 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using namespace std;
 
-pqxx::connection connection(std::getenv("PG_CONNECTION"));
+thread_local pqxx::connection connection(getenv("PG_DSN"));
 map<int, vector<int>> stations;
 map<int, pair<int, int>> port_coords;
 map<int, int> pid_port;
@@ -153,7 +153,7 @@ crow::response RegisterUser(const crow::request &req) {
         resp["id"] = id;
         return crow::response(crow::status::OK, resp);
     }
-    catch (...) {
+    catch (std::runtime_error) {
         return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -180,7 +180,7 @@ crow::response LoginUser(const crow::request &req) {
         resp["id"] = id;
         return crow::response(crow::status::OK, resp);
     }
-    catch (...) {
+    catch (std::runtime_error) {
         return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -207,7 +207,7 @@ crow::response GetUser(const crow::request &req) {
         res["balance"] = balance;
         return crow::response(crow::status::OK, res);
     }
-    catch (...) {
+    catch (std::runtime_error) {
         return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -237,7 +237,7 @@ crow::response ListStations(const crow::request &req) {
 
         return crow::response(crow::status::OK, crow::json::wvalue(res));
     }
-    catch (...) {
+    catch (std::runtime_error) {
         return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -265,7 +265,7 @@ crow::response ListLinks(const crow::request &req) {
         }
         return crow::response(crow::status::OK, crow::json::wvalue(res));
     }
-    catch (...) {
+    catch (std::runtime_error) {
             return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -281,11 +281,23 @@ crow::response CalcRoute(const crow::request &req) {
         string uid = json["uid"].s();
         auto r = w.exec_params("select id from users where id=$1", uid);
         if (r.empty()) {
-            return crow::response(crow::status::UNAUTHORIZED);
+            return crow::response(crow::status::UNAUTHORIZED, "{\"error\":\"Invalid uid\"}");
         }
 
         auto from = json["from"].i();
         auto to = json["to"].i();
+
+        r = w.exec_params("select port from stations where port=$1", from);
+        if (r.empty()) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid `from`\"}");
+        }
+        r = w.exec_params("select port from stations where port=$1", to);
+        if (r.empty()) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid `to`\"}");
+        }
+        if (from == to) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"`from` mustn't be equal `to`\"}");
+        }
 
         vector<int> route_vec = calculateRoute(from, to);
 
@@ -296,8 +308,8 @@ crow::response CalcRoute(const crow::request &req) {
 
         return crow::response(crow::status::OK, crow::json::wvalue(res));
     }
-    catch (...) {
-        return crow::response(crow::status::BAD_REQUEST);
+    catch (std::runtime_error) {
+        return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
 
@@ -338,6 +350,9 @@ crow::response SendOil(const crow::request &req) {
         if (stations.find(to) == stations.end()) {
             return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid destination\"}");
         }
+        if (from == to) {
+            return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"`from` mustn't be equal `to`\"}");
+        }
 
         user_balance -= money;
         w.exec_params("update users set balance=$2 where id=$1", uid, user_balance);
@@ -353,8 +368,8 @@ crow::response SendOil(const crow::request &req) {
 
         return crow::response(crow::status::OK, "{\"data\":\"ok\"}");
     }
-    catch (...) {
-        return crow::response(crow::status::BAD_REQUEST);
+    catch (std::runtime_error) {
+        return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
 
@@ -389,7 +404,7 @@ crow::response AddMoney(const crow::request &req) {
         StationClient(station_id).AddMoney(amount, oil_id);
         return crow::response(crow::status::OK, "{\"data\":\"ok\"}");
     }
-    catch (...) {
+    catch (std::runtime_error) {
         return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -409,7 +424,7 @@ crow::response LastReceived(const crow::request &req) {
         }
 
         crow::json::wvalue::list res;
-        for (auto [sender_id, message, station_id] : w.query<string, string, int>("select sender_id, message, station_id from oil order by time desc limit 10")) {
+        for (auto [sender_id, message, station_id] : w.query<string, string, int>("select sender_id, message, station_id from oil where receiver_id="+w.quote(uid)+" order by time desc limit 10")) {
             auto [username] = *w.query<string>("select username from users where id="+w.quote(sender_id)).begin();
             crow::json::wvalue oil;
             oil["sender"] = username;
@@ -419,7 +434,7 @@ crow::response LastReceived(const crow::request &req) {
         }
         return crow::response(crow::status::OK, crow::json::wvalue(res));
     }
-    catch (...) {
+    catch (std::runtime_error) {
             return crow::response(crow::status::BAD_REQUEST, "{\"error\":\"Invalid json\"}");
     }
 }
@@ -430,7 +445,6 @@ map<string, set<crow::websocket::connection*>> user_connections;
 class MainStationImpl final : public MainStation::Service {
     public:
     grpc::Status Passed(ServerContext *, const PassedRequest *req, None *) override {
-        cout << "Passed; uid: " << req->uid() << "; receiver_id: " << req->receiver_id() << "; station_id: " << req->station_id() << '\n';
         auto resp = crow::json::wvalue();
         resp["type"] = "passed";
         resp["receiver_id"] = req->receiver_id();
@@ -443,7 +457,6 @@ class MainStationImpl final : public MainStation::Service {
     }
 
     grpc::Status NoMoney(ServerContext *, const NoMoneyRequest *req, None *) override {
-        cout << "NoMoney; uid: " << req->uid() << "; receiver_id: " << req->receiver_id() << "; station_id: " << req->station_id() << "; oil_id: " << req->oil_id() << '\n';
         auto resp = crow::json::wvalue();
         resp["type"] = "no_money";
         resp["receiver_id"] = req->receiver_id();
@@ -457,7 +470,6 @@ class MainStationImpl final : public MainStation::Service {
     }
 
     grpc::Status GetOil(ServerContext *, const GetOilRequest *req, None *) override {
-        cout << "GetOil; uid: " << req->uid() << "; msg: " << req->msg() << "; receiver_id: " << req->receiver_id() << "; station_id: " << '\n';
         auto resp = crow::json::wvalue();
         resp["type"] = "get";
         resp["receiver_id"] = req->receiver_id();
@@ -467,7 +479,10 @@ class MainStationImpl final : public MainStation::Service {
         }
         
         pqxx::work w(connection);
-        w.exec_params("INSERT INTO oil (id, sender_id, receiver_id, message, station_id, time) VALUES ($1, $2, $3, $4, $5, $6)", generateId(), req->uid(), req->receiver_id(), req->msg(), req->station_id(), time(NULL));
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        long long time = now.tv_sec * 1000000 + now.tv_usec;
+        w.exec_params("INSERT INTO oil (id, sender_id, receiver_id, message, station_id, time) VALUES ($1, $2, $3, $4, $5, $6)", generateId(), req->uid(), req->receiver_id(), req->msg(), req->station_id(), time);
         w.commit();
 
         return grpc::Status::OK;
@@ -481,7 +496,6 @@ void *runMainStation(void *) {
     builder.AddListeningPort("127.0.0.1:8888", grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     unique_ptr<Server> server(builder.BuildAndStart());
-    cout << "Main station listening on 8888\n";
     server->Wait();
     return NULL;
 }
@@ -492,7 +506,6 @@ void *healthcheck(void *) {
     while (1) {
         wpid = waitpid(-1, &status, 0);
         if (wpid > 0 && WIFSIGNALED(status) && !(WTERMSIG(status) == SIGKILL || WTERMSIG(status) == SIGINT)) {
-            cout << wpid << " segfaulted (" << WTERMSIG(status) << ")\n";
             int port = pid_port[wpid];
             auto [x, y] = port_coords[port];
             pid_port.erase(wpid);
@@ -512,47 +525,47 @@ int main() {
     crow::SimpleApp app;
     mutex mtx;
 
-    CROW_ROUTE(app, "/api/register").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/register").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return RegisterUser(req);
         });
 
-    CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/login").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return LoginUser(req);
         });
 
-    CROW_ROUTE(app, "/api/user").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/user").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return GetUser(req);
         });
 
-    CROW_ROUTE(app, "/api/stations").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/stations").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return ListStations(req);
         });
 
-    CROW_ROUTE(app, "/api/links").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/links").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return ListLinks(req);
         });
 
-    CROW_ROUTE(app, "/api/route").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/route").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req){
             return CalcRoute(req);
         });
 
-    CROW_ROUTE(app, "/api/send").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/send").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req) {
             return SendOil(req);
         });
     
-    CROW_ROUTE(app, "/api/add_money").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/add_money").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req) {
             return AddMoney(req);
         });
 
-    CROW_ROUTE(app, "/api/last_received").methods(crow::HTTPMethod::Post)(
+    CROW_ROUTE(app, "/last_received").methods(crow::HTTPMethod::Post)(
         [](const crow::request &req) {
             return LastReceived(req);
         });
@@ -584,13 +597,14 @@ int main() {
                     return;
                 }
             }
-            catch (...) {
+            catch (std::runtime_error) {
                 conn.send_text("{\"error\":\"Invalid json\"}");
                 return;
             }
         });
-    
-    app.bindaddr("0.0.0.0").port(8000).multithreaded().run();
+
+    app.loglevel(crow::LogLevel::Critical);
+    app.bindaddr("0.0.0.0").port(8087).run();
 
     for (auto [pid, port] : pid_port) {
         kill(pid, SIGKILL);

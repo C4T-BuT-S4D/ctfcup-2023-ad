@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS oil (
     receiver_id VARCHAR(32) REFERENCES users(id),
     message     VARCHAR(100),
     station_id  INTEGER,
-    time        INTEGER
+    time        BIGINT
 );
 
 INSERT INTO stations (port, x, y) values

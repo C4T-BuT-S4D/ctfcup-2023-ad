@@ -20,9 +20,10 @@ using namespace std;
 
 
 struct Oil {
-    string uid, receiver_id, msg;
-    long long money = 0;
+    string uid, receiver_id;
     RepeatedField<int> route;
+    long long money = 0;
+    string msg;
 
     Oil() {}
     Oil(long long _money, string _uid, string _receiver_id, string _msg, RepeatedField<int> _route) {
@@ -35,11 +36,12 @@ struct Oil {
 };
 
 #define MAX_SIZE 1000
+
 int port = 0;
 int x = 0, y = 0;
+Oil out_of_money[MAX_SIZE];
 int next_oil_id = 0;
 map<int, int> port_cost;
-Oil out_of_money[MAX_SIZE];
 
 
 class MainStationClient {
@@ -96,16 +98,6 @@ class StationImpl final : public Station::Service {
             next_oil_id %= MAX_SIZE;
             out_of_money[oil_id] = oil;
 
-            // if (!removed.empty()) {
-            //     oil_id = *removed.begin();
-            //     removed.erase(removed.begin());
-            //     out_of_money[oil_id] = oil;
-            // }
-            // else {
-            //     oil_id = out_of_money.size();
-            //     out_of_money.push_back(oil);
-            // }
-
             MainStationClient().NoMoney(oil.uid, oil.receiver_id, oil_id, oil.money);
         }
         else if (oil.route.size() > 1) {
@@ -125,7 +117,6 @@ class StationImpl final : public Station::Service {
         port = req->port();
         x = req->x();
         y = req->y();
-        cout << "port: " << port << "; x: " << x << "; y: " << y << '\n';
         return grpc::Status::OK;
     }
 
@@ -133,7 +124,6 @@ class StationImpl final : public Station::Service {
         int _port = req->port();
         int _cost = req->cost();
         port_cost[_port] = _cost;
-        cout << "port: " << port << "; _port: " << _port << "; _cost: " << _cost << '\n';
         return grpc::Status::OK;
     }
 
@@ -145,7 +135,6 @@ class StationImpl final : public Station::Service {
             money -= port_cost[prev];
             route.RemoveLast();
         }
-        cout << "port: " << port << "; money: " << money << ";\n";
         
         Oil oil(money, req->uid(), req->receiver_id(), req->msg(), route);
         send_oil(oil);
@@ -155,23 +144,14 @@ class StationImpl final : public Station::Service {
 
     grpc::Status AddMoney(ServerContext *, const AddMoneyRequest *req, None *) override {
         int oil_id = req->oil_id();
-        // if (removed.find(oil_id) != removed.end()) {
-        //     return grpc::Status::OK;
-        // }
-        // if (out_of_money[oil_id].token != req->token()) {
-        //     return grpc::Status::OK;
-        // }
         out_of_money[oil_id].money += req->amount();
         send_oil(out_of_money[oil_id]);
-        // if (out_of_money[oil_id].money >= 0) {
-        //     // removed.insert(oil_id);
-        // }
 
         return grpc::Status::OK;
     }
 };
 
-int main(int /*argc*/, char **argv, char **/*env*/) {
+int main(int, char **argv, char **) {
     string port = argv[1];
 
     StationImpl service;
@@ -180,7 +160,6 @@ int main(int /*argc*/, char **argv, char **/*env*/) {
     builder.AddListeningPort("127.0.0.1:"+port, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     unique_ptr<Server> server(builder.BuildAndStart());
-    cout << "Server listening on " << port << '\n';
 
     server->Wait();
     return 0;

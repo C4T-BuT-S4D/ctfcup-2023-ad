@@ -43,13 +43,13 @@ def add_money():
     balance = int(input('balance: '))
     station_id = int(input('station_id: '))
     oil_id = int(input('oil_id: '))
-    r = requests.post(URL+"/api/add_money", json.dumps({"type":"ADD_MONEY","uid":uid,"amount":balance,"station_id":station_id,"oil_id":oil_id}))
+    r = requests.post(URL+"/api/add_money", json.dumps({"uid":uid,"amount":balance,"station_id":station_id,"oil_id":oil_id}))
     print(r.text)
 
 
 def webs():
     w = websocket.WebSocket()
-    w.connect('ws://localhost:8000/ws')
+    w.connect('ws://localhost:8000/ws/ws')
     uid = input('uid: ').strip()
     w.send(json.dumps({'uid': uid, 'type':'INIT'}))
     print(w.recv())
