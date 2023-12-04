@@ -29,7 +29,7 @@ impl Hash {
                 0x8f2ce0f5,
                 0xb451eaa5
             ],
-            buffer: [].to_vec(),
+            buffer: Vec::new(),
         }
     }
 
@@ -60,7 +60,7 @@ impl Hash {
 
     }
     pub fn digest(self) -> Vec<u8> {
-        self.digest_values().iter().fold(vec![], |mut res, value| {
+        self.digest_values().iter().fold(Vec::new(), |mut res, value| {
             res.extend_from_slice(&value.to_le_bytes());
             res
         })

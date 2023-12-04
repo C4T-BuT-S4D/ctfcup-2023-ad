@@ -124,7 +124,7 @@ impl grpc::oilmarket_server::Oilmarket for Oilmarket {
 
         let mut attesters = Vec::new();
 
-        if request_body.attesters.len() == 0 {
+        if request_body.attesters.is_empty() {
             return Err(Status::invalid_argument("at least one attester must be present"))
         }
 
