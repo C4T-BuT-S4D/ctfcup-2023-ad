@@ -14,6 +14,7 @@ services:
       - 8087:8087
     depends_on:
       - app
+      - db
   app:
     build: .
     cpus: 2
@@ -33,8 +34,8 @@ services:
       POSTGRES_DB: app
       PGDATA: '/var/lib/postgresql/data/pgdata'
     volumes:
+      - ./postgres/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:rox
       - postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 volumes:
   caddy-data:
   caddy-config:

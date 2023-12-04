@@ -98,7 +98,7 @@ GET = "get"
 
 class Checker(BaseChecker):
     vulns: int = 1
-    timeout: int = 15
+    timeout: int = 10
     uses_attack_data: bool = False
     
     def __init__(self, *args, **kwargs):
@@ -212,7 +212,6 @@ class Checker(BaseChecker):
         time.sleep(1)
         self.mch.init_websocket(ws, sender_uid)
         self.mch.send_oil(session, sender_uid, receiver_uid, msg, money, fr, to, Status.MUMBLE)
-
         while True:
             resp = self.mch.get_websocket_json(ws)
             ans = expected_ans.pop()

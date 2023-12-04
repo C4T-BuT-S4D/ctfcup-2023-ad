@@ -44,11 +44,11 @@ class CheckMachine:
     def get_websocket(self) -> websocket.WebSocket:
         ws = websocket.WebSocket()
         ws.connect(self.ws_url)
-        ws.settimeout(10)
+        ws.settimeout(7)
         return ws
 
     def register(self, session: requests.Session, username: str, password: str, status: Status) -> str:
-        resp: requests.Response = session.post(f"{self.url}/register", json={"username": username, "password": password})
+        resp = session.post(f"{self.url}/register", json={"username": username, "password": password})
 
         resp = self.c.get_json(resp, "Invalid response on register", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on register", status)
@@ -60,7 +60,7 @@ class CheckMachine:
         return resp["id"]
 
     def login(self, session: requests.Session, username: str, password: str, status: Status) -> str:
-        resp: requests.Response = session.post(f"{self.url}/login", json={"username": username, "password": password})
+        resp = session.post(f"{self.url}/login", json={"username": username, "password": password})
 
         resp = self.c.get_json(resp, "Invalid response on login", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on login", status)
@@ -72,7 +72,7 @@ class CheckMachine:
         return resp["id"]
 
     def get_user(self, session: requests.Session, uid: str, status: Status) -> User:
-        resp: requests.Response = session.post(f"{self.url}/user", json={"uid": uid})
+        resp = session.post(f"{self.url}/user", json={"uid": uid})
 
         resp = self.c.get_json(resp, "Invalid response on get_user", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on get_user", status)
@@ -86,7 +86,7 @@ class CheckMachine:
         return User(username=resp["username"], uid=resp["uid"], balance=resp["balance"])
 
     def get_stations(self, session: requests.Session, uid: str, status: Status) -> list[Station]:
-        resp: requests.Response = session.post(f"{self.url}/stations", json={"uid": uid})
+        resp = session.post(f"{self.url}/stations", json={"uid": uid})
 
         resp = self.c.get_json(resp, "Invalid response on get_stations", status)
         self.c.assert_eq(type(resp), list, "Invalid response on get_stations", status)
@@ -101,7 +101,7 @@ class CheckMachine:
         return stations
 
     def get_links(self, session: requests.Session, uid: str, status: Status) -> list[Link]:
-        resp: requests.Response = session.post(f"{self.url}/links", json={"uid": uid})
+        resp = session.post(f"{self.url}/links", json={"uid": uid})
 
         resp = self.c.get_json(resp, "Invalid response on get_links", status)
         self.c.assert_eq(type(resp), list, "Invalid response on get_links", status)
@@ -115,7 +115,7 @@ class CheckMachine:
         return links
 
     def get_route(self, session: requests.Session, uid: str, fr: int, to: int, status: Status) -> list[int]:
-        resp: requests.Response = session.post(f"{self.url}/route", json={"uid": uid, "from": fr, "to": to})
+        resp = session.post(f"{self.url}/route", json={"uid": uid, "from": fr, "to": to})
         resp = self.c.get_json(resp, "Invalid response on get_route", status)
         self.c.assert_eq(type(resp), list, "Invalid response on get_route", status)
 
@@ -140,19 +140,19 @@ class CheckMachine:
             self.c.cquit(Status.MUMBLE, "Invalid response on websocket init")
 
     def send_oil(self, session: requests.Session, uid: str, receiver_id: str, msg: str, money: int, fr: int, to: int, status: Status) -> None:
-        resp: requests.Response = session.post(f"{self.url}/send", json={"uid": uid, "receiver_id": receiver_id, "msg": msg, "money": money, "from": fr, "to": to})
+        resp = session.post(f"{self.url}/send", json={"uid": uid, "receiver_id": receiver_id, "msg": msg, "money": money, "from": fr, "to": to})
         resp = self.c.get_json(resp, "Invalid response on send_oil", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on send_oil", status)
         self.c.assert_eq(resp.get("data"), "ok", "Invalid response on send_oil", status)
 
     def add_money(self, session: requests.Session, uid: str, amount: int, station_id: int, oil_id: int, status: Status) -> None:
-        resp: requests.Response = session.post(f"{self.url}/add_money", json={"uid": uid, "amount": amount, "station_id": station_id, "oil_id": oil_id})
+        resp = session.post(f"{self.url}/add_money", json={"uid": uid, "amount": amount, "station_id": station_id, "oil_id": oil_id})
         resp = self.c.get_json(resp, "Invalid response on add_money", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on add_money", status)
         self.c.assert_eq(resp.get("data"), "ok", "Invalid response on add_money", status)
 
     def get_last_received_oil(self, session: requests.Session, uid: str, status: Status) -> list[Oil]:
-        resp: requests.Response = session.post(f"{self.url}/last_received", json={"uid": uid})
+        resp = session.post(f"{self.url}/last_received", json={"uid": uid})
         resp = self.c.get_json(resp, f"Invalid response on get_last_received_oil", status)
         self.c.assert_eq(type(resp), list, f"Invalid response on get_last_received_oil", status)
 
