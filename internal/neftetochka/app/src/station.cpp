@@ -21,9 +21,10 @@ using namespace std;
 #define MAX_SIZE 1000
 
 struct Oil {
-    string uid, receiver_id;
+    string uid;
     RepeatedField<int> route;
     long long money = 0;
+    string receiver_id;
     string msg;
 
     Oil() {}
@@ -36,16 +37,14 @@ struct Oil {
     }
 };
 
-int port = 0;
-
+mutex no_money_mtx; // mutex for `no_money`, `used`, `next_oil_id`
 Oil no_money[MAX_SIZE];
 int used[MAX_SIZE] = {};
 int next_oil_id = 0;
 
-map<int, int> port_cost;
-
 mutex port_mtx;     // mutex for `port`, `port_cost`
-mutex no_money_mtx; // mutex for `no_money`, `used`, `next_oil_id`
+int port = 0;
+map<int, int> port_cost;
 
 
 class MainStationClient {
@@ -59,39 +58,45 @@ class MainStationClient {
     }
 
     void Passed(string uid, string receiver_id, int money) {
-        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         PassedRequest req;
         None resp;
+        {
+        lock_guard<mutex> _(port_mtx);
         req.set_uid(uid);
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
         req.set_money(money);
+        }
         stub_->Passed(&context, req, &resp);
     }
 
     void NoMoney(string uid, string receiver_id, int oil_id, int money) {
-        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         NoMoneyRequest req;
         None resp;
+        {
+        lock_guard<mutex> _(port_mtx);
         req.set_uid(uid);
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
         req.set_oil_id(oil_id);
         req.set_money(money);
+        }
         stub_->NoMoney(&context, req, &resp);
     }
 
     void GetOil(string uid, string msg, string receiver_id) {
-        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         GetOilRequest req;
         None resp;
+        {
+        lock_guard<mutex> _(port_mtx);
         req.set_uid(uid);
         req.set_msg(msg);
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
+        }
         stub_->GetOil(&context, req, &resp);
     }
 };
@@ -103,11 +108,14 @@ class StationImpl final : public Station::Service {
 
     void send_oil(Oil oil) {
         if (oil.money < 0) {
+            int oil_id = 0;
+            {
             lock_guard<mutex> _(no_money_mtx);
-            int oil_id = next_oil_id++;
+            oil_id = next_oil_id++;
             next_oil_id %= MAX_SIZE;
             no_money[oil_id] = oil;
             used[oil_id] = 1;
+            }
             main_client.NoMoney(oil.uid, oil.receiver_id, oil_id, oil.money);
         }
         else if (oil.route.size() > 1) {

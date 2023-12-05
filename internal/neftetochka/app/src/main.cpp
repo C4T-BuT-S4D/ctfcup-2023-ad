@@ -498,6 +498,10 @@ class App final : public MainStation::Service {
         })
         .onmessage([&](crow::websocket::connection &conn, const string &data, bool) {
             try {
+                lock_guard<mutex> _(conn_mtx);
+                if (connection_user.find(&conn) != connection_user.end()) {
+                    return;
+                }
                 auto json = crow::json::load(data);
                 if (!json || !json.has("type") || !json.has("uid")) {
                     conn.send_text("{\"error\":\"Invalid json\"}");
@@ -505,7 +509,6 @@ class App final : public MainStation::Service {
                 }
                 string uid = json["uid"].s();
                 if (json["type"].s() == "INIT") {
-                    lock_guard<mutex> _(conn_mtx);
                     connection_user[&conn] = uid;
                     user_connections[uid].insert(&conn);
                     conn.send_text("{\"data\":\"ok\"}");
