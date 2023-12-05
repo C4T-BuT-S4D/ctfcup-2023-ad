@@ -18,6 +18,7 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using namespace std;
 
+#define MAX_SIZE 1000
 
 struct Oil {
     string uid, receiver_id;
@@ -35,13 +36,16 @@ struct Oil {
     }
 };
 
-#define MAX_SIZE 1000
-
 int port = 0;
-int x = 0, y = 0;
+
 Oil no_money[MAX_SIZE];
+int used[MAX_SIZE] = {};
 int next_oil_id = 0;
+
 map<int, int> port_cost;
+
+mutex port_mtx;     // mutex for `port`, `port_cost`
+mutex no_money_mtx; // mutex for `no_money`, `used`, `next_oil_id`
 
 
 class MainStationClient {
@@ -52,9 +56,10 @@ class MainStationClient {
     MainStationClient() {
         shared_ptr<Channel> channel = grpc::CreateChannel("127.0.0.1:8888", grpc::InsecureChannelCredentials());
         stub_ = MainStation::NewStub(channel);
-    }    
+    }
 
     void Passed(string uid, string receiver_id, int money) {
+        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         PassedRequest req;
         None resp;
@@ -66,6 +71,7 @@ class MainStationClient {
     }
 
     void NoMoney(string uid, string receiver_id, int oil_id, int money) {
+        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         NoMoneyRequest req;
         None resp;
@@ -78,6 +84,7 @@ class MainStationClient {
     }
 
     void GetOil(string uid, string msg, string receiver_id) {
+        lock_guard<mutex> _(port_mtx);
         ClientContext context;
         GetOilRequest req;
         None resp;
@@ -92,35 +99,38 @@ class MainStationClient {
 
 class StationImpl final : public Station::Service {
     private:
+    MainStationClient main_client;
+
     void send_oil(Oil oil) {
         if (oil.money < 0) {
+            lock_guard<mutex> _(no_money_mtx);
             int oil_id = next_oil_id++;
             next_oil_id %= MAX_SIZE;
             no_money[oil_id] = oil;
-
-            MainStationClient().NoMoney(oil.uid, oil.receiver_id, oil_id, oil.money);
+            used[oil_id] = 1;
+            main_client.NoMoney(oil.uid, oil.receiver_id, oil_id, oil.money);
         }
         else if (oil.route.size() > 1) {
             int next = oil.route[oil.route.size() - 2];
-            MainStationClient().Passed(oil.uid, oil.receiver_id, oil.money);
+            main_client.Passed(oil.uid, oil.receiver_id, oil.money);
             StationClient(next).SendOil(oil.uid, oil.receiver_id, oil.msg, oil.money, oil.route);
             return;
         }
         else {
-            MainStationClient().GetOil(oil.uid, oil.msg, oil.receiver_id);
+            main_client.GetOil(oil.uid, oil.msg, oil.receiver_id);
             return;
         }
     }
 
     public:
     grpc::Status Init(ServerContext *, const InitRequest *req, None *) override {
+        lock_guard<mutex> _(port_mtx);
         port = req->port();
-        x = req->x();
-        y = req->y();
         return grpc::Status::OK;
     }
 
     grpc::Status Link(ServerContext *, const LinkRequest *req, None*) override {
+        lock_guard<mutex> _(port_mtx);
         int _port = req->port();
         int _cost = req->cost();
         port_cost[_port] = _cost;
@@ -131,36 +141,42 @@ class StationImpl final : public Station::Service {
         int prev = req->route()[req->route().size() - 1];
         RepeatedField<int> route(req->route().begin(), req->route().end());
         int money = req->money();
-        if (prev != port) {
-            money -= port_cost[prev];
-            route.RemoveLast();
+        {
+            lock_guard<mutex> _(port_mtx);
+            if (prev != port) {
+                money -= port_cost.at(prev);
+                route.RemoveLast();
+            }
         }
-        
         Oil oil(money, req->uid(), req->receiver_id(), req->msg(), route);
         send_oil(oil);
-
         return grpc::Status::OK;
     }
 
     grpc::Status AddMoney(ServerContext *, const AddMoneyRequest *req, None *) override {
         int oil_id = req->oil_id();
-        no_money[oil_id].money += req->amount();
-        send_oil(no_money[oil_id]);
-
+        Oil to_send;
+        {
+            lock_guard<mutex> _(no_money_mtx);
+            if (!used[oil_id]) {
+                return grpc::Status::OK;
+            }
+            no_money[oil_id].money += req->amount();
+            used[oil_id] = 0;
+            to_send = no_money[oil_id];
+        }
+        send_oil(to_send);
         return grpc::Status::OK;
     }
 };
 
 int main(int, char **argv, char **) {
     string port = argv[1];
-
     StationImpl service;
-
     ServerBuilder builder;
     builder.AddListeningPort("127.0.0.1:"+port, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
     unique_ptr<Server> server(builder.BuildAndStart());
-
     server->Wait();
     return 0;
 }

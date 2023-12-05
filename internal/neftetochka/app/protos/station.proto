@@ -46,8 +46,6 @@ service Station {
 
 message InitRequest {
     int32 port = 1;
-    int32 x = 2;
-    int32 y = 3;
 }
 
 message LinkRequest {

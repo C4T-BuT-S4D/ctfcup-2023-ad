@@ -20,14 +20,15 @@ class StationClient {
         stub_ = Station::NewStub(channel);
     }
 
-    void InitStation(int port, int x, int y) {
+    StationClient(shared_ptr<Channel> channel) {
+        stub_ = Station::NewStub(channel);
+    }
+
+    void InitStation(int port) {
         ClientContext context;
         InitRequest req;
         None resp;
-        req.set_port(port);
-        req.set_x(x);
-        req.set_y(y);
-        
+        req.set_port(port);        
         stub_->Init(&context, req, &resp);
     }
 
@@ -37,7 +38,6 @@ class StationClient {
         None resp;
         req.set_port(port);
         req.set_cost(cost);
-
         stub_->Link(&context, req, &resp);
     }
 
@@ -50,7 +50,6 @@ class StationClient {
         req.set_msg(msg);
         req.set_money(money);
         req.mutable_route()->Swap(&route);
-
         stub_->SendOil(&context, req, &resp);
     }
 
@@ -60,7 +59,6 @@ class StationClient {
         None resp;
         req.set_amount(amount);
         req.set_oil_id(oil_id);
-
         stub_->AddMoney(&context, req, &resp);
     }
 };

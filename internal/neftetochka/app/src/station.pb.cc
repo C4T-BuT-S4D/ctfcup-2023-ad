@@ -72,8 +72,6 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORIT
 PROTOBUF_CONSTEXPR InitRequest::InitRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.port_)*/0
-  , /*decltype(_impl_.x_)*/0
-  , /*decltype(_impl_.y_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct InitRequestDefaultTypeInternal {
   PROTOBUF_CONSTEXPR InitRequestDefaultTypeInternal()
@@ -184,8 +182,6 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::InitRequest, _impl_.port_),
-  PROTOBUF_FIELD_OFFSET(::InitRequest, _impl_.x_),
-  PROTOBUF_FIELD_OFFSET(::InitRequest, _impl_.y_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::LinkRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -225,10 +221,10 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 10, -1, -1, sizeof(::NoMoneyRequest)},
   { 21, -1, -1, sizeof(::GetOilRequest)},
   { 31, -1, -1, sizeof(::InitRequest)},
-  { 40, -1, -1, sizeof(::LinkRequest)},
-  { 48, -1, -1, sizeof(::SendOilRequest)},
-  { 59, -1, -1, sizeof(::AddMoneyRequest)},
-  { 67, -1, -1, sizeof(::None)},
+  { 38, -1, -1, sizeof(::LinkRequest)},
+  { 46, -1, -1, sizeof(::SendOilRequest)},
+  { 57, -1, -1, sizeof(::AddMoneyRequest)},
+  { 65, -1, -1, sizeof(::None)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -250,26 +246,26 @@ const char descriptor_table_protodef_station_2eproto[] PROTOBUF_SECTION_VARIABLE
   "tion_id\030\003 \001(\003\022\016\n\006oil_id\030\004 \001(\003\022\r\n\005money\030\005"
   " \001(\003\"R\n\rGetOilRequest\022\013\n\003uid\030\001 \001(\t\022\013\n\003ms"
   "g\030\002 \001(\t\022\023\n\013receiver_id\030\003 \001(\t\022\022\n\nstation_"
-  "id\030\004 \001(\003\"1\n\013InitRequest\022\014\n\004port\030\001 \001(\005\022\t\n"
-  "\001x\030\002 \001(\005\022\t\n\001y\030\003 \001(\005\")\n\013LinkRequest\022\014\n\004po"
-  "rt\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005\"]\n\016SendOilRequest"
-  "\022\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_id\030\002 \001(\t\022\013\n\003ms"
-  "g\030\003 \001(\t\022\r\n\005money\030\004 \001(\003\022\r\n\005route\030\005 \003(\005\"1\n"
-  "\017AddMoneyRequest\022\016\n\006amount\030\002 \001(\005\022\016\n\006oil_"
-  "id\030\003 \001(\005\"\006\n\004None*_\n\006Status\022\026\n\022STATUS_UNS"
-  "PECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010NO_MONEY\020\002\022\010\n\004PASS"
-  "\020\003\022\t\n\005READY\020\004\022\022\n\016INVALID_OIL_ID\020\0052x\n\013Mai"
-  "nStation\022!\n\006Passed\022\016.PassedRequest\032\005.Non"
-  "e\"\000\022#\n\007NoMoney\022\017.NoMoneyRequest\032\005.None\"\000"
-  "\022!\n\006GetOil\022\016.GetOilRequest\032\005.None\"\0002\223\001\n\007"
-  "Station\022\035\n\004Init\022\014.InitRequest\032\005.None\"\000\022\035"
-  "\n\004Link\022\014.LinkRequest\032\005.None\"\000\022#\n\007SendOil"
-  "\022\017.SendOilRequest\032\005.None\"\000\022%\n\010AddMoney\022\020"
-  ".AddMoneyRequest\032\005.None\"\000b\006proto3"
+  "id\030\004 \001(\003\"\033\n\013InitRequest\022\014\n\004port\030\001 \001(\005\")\n"
+  "\013LinkRequest\022\014\n\004port\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005"
+  "\"]\n\016SendOilRequest\022\013\n\003uid\030\001 \001(\t\022\023\n\013recei"
+  "ver_id\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\022\r\n\005money\030\004 \001(\003"
+  "\022\r\n\005route\030\005 \003(\005\"1\n\017AddMoneyRequest\022\016\n\006am"
+  "ount\030\002 \001(\005\022\016\n\006oil_id\030\003 \001(\005\"\006\n\004None*_\n\006St"
+  "atus\022\026\n\022STATUS_UNSPECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010"
+  "NO_MONEY\020\002\022\010\n\004PASS\020\003\022\t\n\005READY\020\004\022\022\n\016INVAL"
+  "ID_OIL_ID\020\0052x\n\013MainStation\022!\n\006Passed\022\016.P"
+  "assedRequest\032\005.None\"\000\022#\n\007NoMoney\022\017.NoMon"
+  "eyRequest\032\005.None\"\000\022!\n\006GetOil\022\016.GetOilReq"
+  "uest\032\005.None\"\0002\223\001\n\007Station\022\035\n\004Init\022\014.Init"
+  "Request\032\005.None\"\000\022\035\n\004Link\022\014.LinkRequest\032\005"
+  ".None\"\000\022#\n\007SendOil\022\017.SendOilRequest\032\005.No"
+  "ne\"\000\022%\n\010AddMoney\022\020.AddMoneyRequest\032\005.Non"
+  "e\"\000b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_station_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_station_2eproto = {
-    false, false, 913, descriptor_table_protodef_station_2eproto,
+    false, false, 891, descriptor_table_protodef_station_2eproto,
     "station.proto",
     &descriptor_table_station_2eproto_once, nullptr, 0, 8,
     schemas, file_default_instances, TableStruct_station_2eproto::offsets,
@@ -1298,14 +1294,10 @@ InitRequest::InitRequest(const InitRequest& from)
   InitRequest* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.port_){}
-    , decltype(_impl_.x_){}
-    , decltype(_impl_.y_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.port_, &from._impl_.port_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.y_) -
-    reinterpret_cast<char*>(&_impl_.port_)) + sizeof(_impl_.y_));
+  _this->_impl_.port_ = from._impl_.port_;
   // @@protoc_insertion_point(copy_constructor:InitRequest)
 }
 
@@ -1315,8 +1307,6 @@ inline void InitRequest::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.port_){0}
-    , decltype(_impl_.x_){0}
-    , decltype(_impl_.y_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -1344,9 +1334,7 @@ void InitRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&_impl_.port_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.y_) -
-      reinterpret_cast<char*>(&_impl_.port_)) + sizeof(_impl_.y_));
+  _impl_.port_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1360,22 +1348,6 @@ const char* InitRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* c
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
           _impl_.port_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // int32 x = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _impl_.x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // int32 y = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _impl_.y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1415,18 +1387,6 @@ uint8_t* InitRequest::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_port(), target);
   }
 
-  // int32 x = 2;
-  if (this->_internal_x() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(2, this->_internal_x(), target);
-  }
-
-  // int32 y = 3;
-  if (this->_internal_y() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteInt32ToArray(3, this->_internal_y(), target);
-  }
-
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1446,16 +1406,6 @@ size_t InitRequest::ByteSizeLong() const {
   // int32 port = 1;
   if (this->_internal_port() != 0) {
     total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_port());
-  }
-
-  // int32 x = 2;
-  if (this->_internal_x() != 0) {
-    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_x());
-  }
-
-  // int32 y = 3;
-  if (this->_internal_y() != 0) {
-    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_y());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -1479,12 +1429,6 @@ void InitRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   if (from._internal_port() != 0) {
     _this->_internal_set_port(from._internal_port());
   }
-  if (from._internal_x() != 0) {
-    _this->_internal_set_x(from._internal_x());
-  }
-  if (from._internal_y() != 0) {
-    _this->_internal_set_y(from._internal_y());
-  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1502,12 +1446,7 @@ bool InitRequest::IsInitialized() const {
 void InitRequest::InternalSwap(InitRequest* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(InitRequest, _impl_.y_)
-      + sizeof(InitRequest::_impl_.y_)
-      - PROTOBUF_FIELD_OFFSET(InitRequest, _impl_.port_)>(
-          reinterpret_cast<char*>(&_impl_.port_),
-          reinterpret_cast<char*>(&other->_impl_.port_));
+  swap(_impl_.port_, other->_impl_.port_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata InitRequest::GetMetadata() const {

@@ -53,9 +53,9 @@ class CheckMachine:
         resp = self.c.get_json(resp, "Invalid response on register", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on register", status)
         if resp.get("error", "") != "":
-            self.c.cquit(status, f"Error on register: {resp['error']}")
+            self.c.cquit(status, "Error on register")
         if resp.get("id", "") == "":
-            self.c.cquit(status, f"Could not register")
+            self.c.cquit(status, "Could not register")
 
         return resp["id"]
 
@@ -65,9 +65,9 @@ class CheckMachine:
         resp = self.c.get_json(resp, "Invalid response on login", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on login", status)
         if resp.get("error", "") != "":
-            self.c.cquit(status, f"Error on login: {resp['error']}")
+            self.c.cquit(status, "Error on login")
         if resp.get("id", "") == "":
-            self.c.cquit(status, f"Could not login")
+            self.c.cquit(status, "Could not login")
 
         return resp["id"]
 
@@ -77,7 +77,7 @@ class CheckMachine:
         resp = self.c.get_json(resp, "Invalid response on get_user", status)
         self.c.assert_eq(type(resp), dict, "Invalid response on get_user", status)
         if resp.get('error', '') != '':
-            self.c.cquit(status, f"Error on get_user: {resp['error']}")
+            self.c.cquit(status, "Error on get_user")
         self.c.assert_eq(type(resp["username"]), str, "Invalid response on get_user", status)
         self.c.assert_eq(type(resp["uid"]), str, "Invalid response on get_user", status)
         self.c.assert_eq(type(resp["balance"]), int, "Invalid response on get_user", status)

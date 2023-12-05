@@ -823,8 +823,6 @@ class InitRequest final :
 
   enum : int {
     kPortFieldNumber = 1,
-    kXFieldNumber = 2,
-    kYFieldNumber = 3,
   };
   // int32 port = 1;
   void clear_port();
@@ -833,24 +831,6 @@ class InitRequest final :
   private:
   int32_t _internal_port() const;
   void _internal_set_port(int32_t value);
-  public:
-
-  // int32 x = 2;
-  void clear_x();
-  int32_t x() const;
-  void set_x(int32_t value);
-  private:
-  int32_t _internal_x() const;
-  void _internal_set_x(int32_t value);
-  public:
-
-  // int32 y = 3;
-  void clear_y();
-  int32_t y() const;
-  void set_y(int32_t value);
-  private:
-  int32_t _internal_y() const;
-  void _internal_set_y(int32_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:InitRequest)
@@ -862,8 +842,6 @@ class InitRequest final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     int32_t port_;
-    int32_t x_;
-    int32_t y_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2037,46 +2015,6 @@ inline void InitRequest::_internal_set_port(int32_t value) {
 inline void InitRequest::set_port(int32_t value) {
   _internal_set_port(value);
   // @@protoc_insertion_point(field_set:InitRequest.port)
-}
-
-// int32 x = 2;
-inline void InitRequest::clear_x() {
-  _impl_.x_ = 0;
-}
-inline int32_t InitRequest::_internal_x() const {
-  return _impl_.x_;
-}
-inline int32_t InitRequest::x() const {
-  // @@protoc_insertion_point(field_get:InitRequest.x)
-  return _internal_x();
-}
-inline void InitRequest::_internal_set_x(int32_t value) {
-  
-  _impl_.x_ = value;
-}
-inline void InitRequest::set_x(int32_t value) {
-  _internal_set_x(value);
-  // @@protoc_insertion_point(field_set:InitRequest.x)
-}
-
-// int32 y = 3;
-inline void InitRequest::clear_y() {
-  _impl_.y_ = 0;
-}
-inline int32_t InitRequest::_internal_y() const {
-  return _impl_.y_;
-}
-inline int32_t InitRequest::y() const {
-  // @@protoc_insertion_point(field_get:InitRequest.y)
-  return _internal_y();
-}
-inline void InitRequest::_internal_set_y(int32_t value) {
-  
-  _impl_.y_ = value;
-}
-inline void InitRequest::set_y(int32_t value) {
-  _internal_set_y(value);
-  // @@protoc_insertion_point(field_set:InitRequest.y)
 }
 
 // -------------------------------------------------------------------

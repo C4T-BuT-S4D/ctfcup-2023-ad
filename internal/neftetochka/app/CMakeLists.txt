@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # add_compile_options(-D_GLIBCXX_USE_CXX11_ABI=0)
+# add_compile_options(-Wall -Wextra -pedantic -Werror)
 add_link_options(-Wl,-z,relro,-z,lazy)
 
 include(${PROJECT_SOURCE_DIR}/conan/cmake)
