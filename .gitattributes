@@ -2,3 +2,4 @@ checkers/bluwal/proto/** linguist-vendored
 sploits/bluwal/proto/** linguist-vendored
 services/bluwal/proto/python/** linguist-vendored
 services/bluwal/pkg/proto/** linguist-vendored
+services/bluwal/front/src/proto/** linguist-vendored
