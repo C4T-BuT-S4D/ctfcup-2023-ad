@@ -284,7 +284,7 @@ class Checker(BaseChecker):
 
         self._send_oil(session, sender, receiver, flag, money, fr, to)
 
-        self.cquit(Status.OK, '', f'{receiver}')
+        self.cquit(Status.OK, f'{receiver}')
 
     def get(self, flag_id: str, flag: str, vuln: str):
         session = get_initialized_session()

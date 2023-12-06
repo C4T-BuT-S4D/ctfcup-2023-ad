@@ -43,6 +43,7 @@ CONTAINER_ALLOWED_OPTIONS = CONTAINER_REQUIRED_OPTIONS + [
     "volumes",
     "environment",
     "env_file",
+    "healthcheck",
     "depends_on",
     "sysctls",
     "privileged",
@@ -72,6 +73,8 @@ ALLOWED_CHECKER_PATTERNS = [
     "s: requests.Session",
     "sess: requests.Session",
     "session: requests.Session",
+    "r: requests.Response",
+    "resp: requests.Response",
     "Got requests connection error",
 ]
 FORBIDDEN_CHECKER_PATTERNS = ["requests"]
@@ -160,7 +163,7 @@ class Checker(BaseValidator):
         self._fatal(
             60 > self._timeout > 0,
             f"invalid timeout: {self._timeout}",
-            )
+        )
 
     @property
     def info(self):
@@ -173,6 +176,11 @@ class Checker(BaseValidator):
     def _run_command(self, command: List[str], env=None) -> Tuple[str, str]:
         action = command[1].upper()
         cmd = ["timeout", str(self._timeout)] + command
+
+        if env is None:
+            env = os.environ
+        env["PYTHONUNBUFFERED"] = "1"
+        env["PWNLIB_NOTERM"] = "1"
 
         start = time.monotonic()
         p = subprocess.run(cmd, capture_output=True, check=False, env=env)
@@ -190,7 +198,7 @@ class Checker(BaseValidator):
         self._fatal(
             p.returncode != 124,
             f"action {action}: bad return code: 124, probably {ColorType.BOLD}timeout{ColorType.ENDC}",
-            )
+        )
         self._fatal(
             p.returncode == 101, f"action {action}: bad return code: {p.returncode}"
         )
@@ -206,15 +214,22 @@ class Checker(BaseValidator):
         cmd = [str(self._exe_path), "put", HOST, flag_id, flag, str(vuln)]
         out, err = self._run_command(cmd)
 
-        self._fatal(out, "stdout is empty")
-
-        new_flag_id = err
-        self._fatal(new_flag_id, "returned flag_id is empty")
+        self._fatal(len(out) <= 1024, "returned stdout is longer than 1024 characters")
+        self._fatal(len(err) <= 1024, "returned stderr is longer than 1024 characters")
 
         if self._attack_data:
+            self._fatal(out, "stdout is empty")
+            self._fatal(err, "stderr is empty")
+
             self._fatal(flag not in out, "flag is leaked in public data")
 
-        return new_flag_id
+            # new flag ID is in stderr for attack_data checkers
+            return err
+
+        self._fatal(out, "stdout is empty")
+
+        # new flag ID is in stdout for checkers without attack_data
+        return out
 
     def get(self, flag: str, flag_id: str, vuln: int):
         self._log(f"running GET, flag={flag} flag_id={flag_id} vuln={vuln}")
@@ -347,13 +362,13 @@ class StructureValidator(BaseValidator):
                 self._error(
                     2.4 <= dc_version < 3,
                     f"invalid version in {path}, need >=2.4 and <3 (or no version at all), got {dc_version}",
-                    )
+                )
 
             for opt in dc:
                 self._error(
                     opt in DC_ALLOWED_OPTIONS,
                     f"option {opt} in {path} is not allowed",
-                    )
+                )
 
             services = []
             databases = []
@@ -377,19 +392,19 @@ class StructureValidator(BaseValidator):
                     self._error(
                         opt in container_conf,
                         f"required option {opt} not in {path} for container {container}",
-                        )
+                    )
 
                 self._error(
                     "restart" in container_conf
                     and container_conf["restart"] == "unless-stopped",
                     f'restart option in {path} for container {container} must be equal to "unless-stopped"',
-                    )
+                )
 
                 for opt in container_conf:
                     self._error(
                         opt in CONTAINER_ALLOWED_OPTIONS,
                         f"option {opt} in {path} is not allowed for container {container}",
-                        )
+                    )
 
                 if self._error(
                     "image" not in container_conf or "build" not in container_conf,
@@ -455,27 +470,27 @@ class StructureValidator(BaseValidator):
                         self._error(
                             opt in container_conf,
                             f"required option {opt} not in {path} for service {container}",
-                            )
+                        )
 
                     for opt in container_conf:
                         self._error(
                             opt in SERVICE_ALLOWED_OPTIONS,
                             f"option {opt} in {path} is not allowed for service {container}",
-                            )
+                        )
 
             for service in services:
                 for database in databases:
-                    self._error(
+                    self._warning(
                         service in dependencies and database in dependencies[service],
                         f"service {service} may need to depends_on database {database}",
-                        )
+                    )
 
             for proxy in proxies:
                 for service in services:
-                    self._error(
+                    self._warning(
                         proxy in dependencies and service in dependencies[proxy],
                         f"proxy {proxy} may need to depends_on service {service}",
-                        )
+                    )
 
         elif BASE_DIR / "checkers" in f.parents and f.suffix == ".py":
             checker_code = f.read_text()
