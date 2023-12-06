@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	BluwalService_ContestCreate_FullMethodName   = "/bluwal.BluwalService/ContestCreate"
 	BluwalService_ContestGet_FullMethodName      = "/bluwal.BluwalService/ContestGet"
+	BluwalService_ContestList_FullMethodName     = "/bluwal.BluwalService/ContestList"
 	BluwalService_ContestEnroll_FullMethodName   = "/bluwal.BluwalService/ContestEnroll"
 	BluwalService_ChallengeSubmit_FullMethodName = "/bluwal.BluwalService/ChallengeSubmit"
 	BluwalService_CheckGoal_FullMethodName       = "/bluwal.BluwalService/CheckGoal"
@@ -33,6 +34,7 @@ const (
 type BluwalServiceClient interface {
 	ContestCreate(ctx context.Context, in *ContestCreateRequest, opts ...grpc.CallOption) (*ContestCreateResponse, error)
 	ContestGet(ctx context.Context, in *ContestGetRequest, opts ...grpc.CallOption) (*ContestGetResponse, error)
+	ContestList(ctx context.Context, in *ContestListRequest, opts ...grpc.CallOption) (*ContestListResponse, error)
 	ContestEnroll(ctx context.Context, in *ContestEnrollRequest, opts ...grpc.CallOption) (*ContestEnrollResponse, error)
 	ChallengeSubmit(ctx context.Context, in *ChallengeSubmitRequest, opts ...grpc.CallOption) (*ChallengeSubmitResponse, error)
 	CheckGoal(ctx context.Context, in *CheckGoalRequest, opts ...grpc.CallOption) (*CheckGoalResponse, error)
@@ -59,6 +61,15 @@ func (c *bluwalServiceClient) ContestCreate(ctx context.Context, in *ContestCrea
 func (c *bluwalServiceClient) ContestGet(ctx context.Context, in *ContestGetRequest, opts ...grpc.CallOption) (*ContestGetResponse, error) {
 	out := new(ContestGetResponse)
 	err := c.cc.Invoke(ctx, BluwalService_ContestGet_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bluwalServiceClient) ContestList(ctx context.Context, in *ContestListRequest, opts ...grpc.CallOption) (*ContestListResponse, error) {
+	out := new(ContestListResponse)
+	err := c.cc.Invoke(ctx, BluwalService_ContestList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +118,7 @@ func (c *bluwalServiceClient) ClaimReward(ctx context.Context, in *ClaimRewardRe
 type BluwalServiceServer interface {
 	ContestCreate(context.Context, *ContestCreateRequest) (*ContestCreateResponse, error)
 	ContestGet(context.Context, *ContestGetRequest) (*ContestGetResponse, error)
+	ContestList(context.Context, *ContestListRequest) (*ContestListResponse, error)
 	ContestEnroll(context.Context, *ContestEnrollRequest) (*ContestEnrollResponse, error)
 	ChallengeSubmit(context.Context, *ChallengeSubmitRequest) (*ChallengeSubmitResponse, error)
 	CheckGoal(context.Context, *CheckGoalRequest) (*CheckGoalResponse, error)
@@ -123,6 +135,9 @@ func (UnimplementedBluwalServiceServer) ContestCreate(context.Context, *ContestC
 }
 func (UnimplementedBluwalServiceServer) ContestGet(context.Context, *ContestGetRequest) (*ContestGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContestGet not implemented")
+}
+func (UnimplementedBluwalServiceServer) ContestList(context.Context, *ContestListRequest) (*ContestListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ContestList not implemented")
 }
 func (UnimplementedBluwalServiceServer) ContestEnroll(context.Context, *ContestEnrollRequest) (*ContestEnrollResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ContestEnroll not implemented")
@@ -181,6 +196,24 @@ func _BluwalService_ContestGet_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BluwalServiceServer).ContestGet(ctx, req.(*ContestGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BluwalService_ContestList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContestListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BluwalServiceServer).ContestList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BluwalService_ContestList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BluwalServiceServer).ContestList(ctx, req.(*ContestListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -271,6 +304,10 @@ var BluwalService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ContestGet",
 			Handler:    _BluwalService_ContestGet_Handler,
+		},
+		{
+			MethodName: "ContestList",
+			Handler:    _BluwalService_ContestList_Handler,
 		},
 		{
 			MethodName: "ContestEnroll",

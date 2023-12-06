@@ -24,6 +24,11 @@ class BluwalServiceStub(object):
                 request_serializer=bluwal_dot_bluwal__pb2.ContestGetRequest.SerializeToString,
                 response_deserializer=bluwal_dot_bluwal__pb2.ContestGetResponse.FromString,
                 )
+        self.ContestList = channel.unary_unary(
+                '/bluwal.BluwalService/ContestList',
+                request_serializer=bluwal_dot_bluwal__pb2.ContestListRequest.SerializeToString,
+                response_deserializer=bluwal_dot_bluwal__pb2.ContestListResponse.FromString,
+                )
         self.ContestEnroll = channel.unary_unary(
                 '/bluwal.BluwalService/ContestEnroll',
                 request_serializer=bluwal_dot_bluwal__pb2.ContestEnrollRequest.SerializeToString,
@@ -56,6 +61,12 @@ class BluwalServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ContestGet(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ContestList(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -97,6 +108,11 @@ def add_BluwalServiceServicer_to_server(servicer, server):
                     servicer.ContestGet,
                     request_deserializer=bluwal_dot_bluwal__pb2.ContestGetRequest.FromString,
                     response_serializer=bluwal_dot_bluwal__pb2.ContestGetResponse.SerializeToString,
+            ),
+            'ContestList': grpc.unary_unary_rpc_method_handler(
+                    servicer.ContestList,
+                    request_deserializer=bluwal_dot_bluwal__pb2.ContestListRequest.FromString,
+                    response_serializer=bluwal_dot_bluwal__pb2.ContestListResponse.SerializeToString,
             ),
             'ContestEnroll': grpc.unary_unary_rpc_method_handler(
                     servicer.ContestEnroll,
@@ -159,6 +175,23 @@ class BluwalService(object):
         return grpc.experimental.unary_unary(request, target, '/bluwal.BluwalService/ContestGet',
             bluwal_dot_bluwal__pb2.ContestGetRequest.SerializeToString,
             bluwal_dot_bluwal__pb2.ContestGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ContestList(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/bluwal.BluwalService/ContestList',
+            bluwal_dot_bluwal__pb2.ContestListRequest.SerializeToString,
+            bluwal_dot_bluwal__pb2.ContestListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

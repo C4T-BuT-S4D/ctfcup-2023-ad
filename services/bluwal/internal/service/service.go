@@ -83,6 +83,7 @@ func (s *Service) ContestGet(_ context.Context, request *bwpb.ContestGetRequest)
 
 	if contest.Author != request.Author {
 		contest.Reward = ""
+		contest.Author = ""
 	}
 
 	res, err := contest.ToProto()
@@ -91,6 +92,31 @@ func (s *Service) ContestGet(_ context.Context, request *bwpb.ContestGetRequest)
 	}
 	return &bwpb.ContestGetResponse{
 		Contest: res,
+	}, nil
+}
+
+func (s *Service) ContestList(_ context.Context, request *bwpb.ContestListRequest) (*bwpb.ContestListResponse, error) {
+	if request.Limit == 0 {
+		request.Limit = 20
+	}
+	if request.Limit > 50 {
+		request.Limit = 50
+	}
+	contests, err := s.c.ListContests(request.Author, request.Limit, request.Offset)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "listing contests: %v", err)
+	}
+
+	contestsProto := make([]*bwpb.Contest, 0, len(contests))
+	for _, contest := range contests {
+		contestProto, err := contest.ToProto()
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "converting contest to proto: %v", err)
+		}
+		contestsProto = append(contestsProto, contestProto)
+	}
+	return &bwpb.ContestListResponse{
+		Contests: contestsProto,
 	}, nil
 }
 

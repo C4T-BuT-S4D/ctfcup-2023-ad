@@ -132,3 +132,19 @@ class ClaimRewardResponse(_message.Message):
     REWARD_FIELD_NUMBER: _ClassVar[int]
     reward: str
     def __init__(self, reward: _Optional[str] = ...) -> None: ...
+
+class ContestListRequest(_message.Message):
+    __slots__ = ["author", "limit", "offset"]
+    AUTHOR_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    OFFSET_FIELD_NUMBER: _ClassVar[int]
+    author: str
+    limit: int
+    offset: int
+    def __init__(self, author: _Optional[str] = ..., limit: _Optional[int] = ..., offset: _Optional[int] = ...) -> None: ...
+
+class ContestListResponse(_message.Message):
+    __slots__ = ["contests"]
+    CONTESTS_FIELD_NUMBER: _ClassVar[int]
+    contests: _containers.RepeatedCompositeFieldContainer[Contest]
+    def __init__(self, contests: _Optional[_Iterable[_Union[Contest, _Mapping]]] = ...) -> None: ...

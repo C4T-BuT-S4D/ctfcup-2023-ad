@@ -13,7 +13,8 @@ import (
 	"bluwal/internal/service"
 	bwpb "bluwal/pkg/proto/bluwal"
 
-	mu "github.com/c4t-but-s4d/cbs-go/multiproto"
+	"github.com/c4t-but-s4d/neo/v2/pkg/mu"
+	"github.com/c4t-but-s4d/neo/v2/pkg/neohttp"
 	"github.com/genjidb/genji"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -44,7 +45,10 @@ func main() {
 
 	bwpb.RegisterBluwalServiceServer(server, bs)
 
-	handler := mu.NewHandler(server)
+	httpHandler := http.NewServeMux()
+	httpHandler.Handle("/", neohttp.StaticHandler("front/dist"))
+
+	handler := mu.NewHandler(server, mu.WithHTTPHandler(httpHandler))
 	httpServer := &http.Server{
 		Handler: handler,
 		Addr:    ":9090",

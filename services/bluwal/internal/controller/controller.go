@@ -8,7 +8,9 @@ import (
 
 	"github.com/genjidb/genji"
 	"github.com/genjidb/genji/document"
+	"github.com/genjidb/genji/types"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -46,6 +48,40 @@ func (c *Controller) GetContest(id string) (*models.Contest, error) {
 		return nil, fmt.Errorf("scanning contest: %w", err)
 	}
 	return &contest, nil
+}
+
+func (c *Controller) ListContests(author string, limit, offset uint32) ([]*models.Contest, error) {
+	var (
+		err error
+		res *genji.Result
+	)
+	if author == "" {
+		res, err = c.db.Query("SELECT * FROM contests LIMIT ? OFFSET ?", limit, offset)
+	} else {
+		res, err = c.db.Query("SELECT * FROM contests WHERE author = ? LIMIT ? OFFSET ?", author, limit, offset)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("querying contests: %w", err)
+	}
+	defer func() {
+		if err := res.Close(); err != nil {
+			logrus.Errorf("closing result: %v", err)
+		}
+	}()
+
+	var contests []*models.Contest
+	if err := res.Iterate(func(d types.Document) error {
+		var contest models.Contest
+		if err := document.StructScan(d, &contest); err != nil {
+			return fmt.Errorf("scanning contest: %w", err)
+		}
+		contests = append(contests, &contest)
+		return nil
+	}); err != nil {
+		return nil, fmt.Errorf("iterating contests: %w", err)
+	}
+
+	return contests, nil
 }
 
 func (c *Controller) CreateEnrollment(enrollment *models.Enrollment) error {

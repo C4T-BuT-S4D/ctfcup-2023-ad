@@ -9,6 +9,8 @@ service BluwalService {
 
     rpc ContestGet(bluwal.ContestGetRequest) returns (bluwal.ContestGetResponse);
 
+    rpc ContestList(bluwal.ContestListRequest) returns (bluwal.ContestListResponse);
+
     rpc ContestEnroll(bluwal.ContestEnrollRequest) returns (bluwal.ContestEnrollResponse);
 
     rpc ChallengeSubmit(bluwal.ChallengeSubmitRequest) returns (bluwal.ChallengeSubmitResponse);

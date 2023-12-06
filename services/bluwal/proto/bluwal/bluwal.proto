@@ -90,3 +90,13 @@ message ClaimRewardRequest {
 message ClaimRewardResponse {
     string reward = 1;
 }
+
+message ContestListRequest {
+    string author = 1;
+    uint32 limit = 2;
+    uint32 offset = 3;
+}
+
+message ContestListResponse {
+    repeated Contest contests = 1;
+}
