@@ -78,6 +78,7 @@ FORBIDDEN_CHECKER_PATTERNS = ["requests"]
 ALLOWED_YAML_FILES = [
     "buf.yaml",
     "buf.gen.yaml",
+    "pnpm-lock.yaml",
 ]
 
 
