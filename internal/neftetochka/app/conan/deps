@@ -1,0 +1,8 @@
+[requires]
+libpqxx/7.7.4
+grpc/1.54.3
+protobuf/3.21.12
+
+[generators]
+cmake_find_package
+cmake_paths

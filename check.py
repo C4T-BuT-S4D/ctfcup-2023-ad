@@ -67,6 +67,7 @@ VALIDATE_DIRS = ["checkers", "services", "internal", "sploits"]
 
 ALLOWED_CHECKER_PATTERNS = [
     "import requests",
+    "requests/",
     "requests.exceptions",
     "s: requests.Session",
     "sess: requests.Session",
