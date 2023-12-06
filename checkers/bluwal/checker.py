@@ -14,7 +14,7 @@ from proto.bluwal.bluwal_pb2 import Contest, ChallengeSubmitRequest, EnrollmentF
 
 class Checker(BaseChecker):
     vulns: int = 1
-    timeout: int = 15
+    timeout: int = 10
     uses_attack_data: bool = True
 
     def __init__(self, *args, **kwargs):
