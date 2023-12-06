@@ -1,2 +1,4 @@
 checklib
+grpcio
+protobuf
 gpxpy
