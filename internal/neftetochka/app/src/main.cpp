@@ -29,8 +29,8 @@ class App final : public MainStation::Service {
 
     map<int, vector<int>> stations;
     map<int, pair<int, int>> port_coords;
-    map<int, int> pid_port;
-    mutex port_mtx; // mutex for `stations`, `port_coords`, `pid_port`
+    map<int, int> pid_port, port_pid;
+    mutex port_mtx; // mutex for `stations`, `port_coords`, `pid_port`, `port_pid`
 
     map<crow::websocket::connection*, string> connection_user;
     map<string, set<crow::websocket::connection*>> user_connections;
@@ -74,6 +74,19 @@ class App final : public MainStation::Service {
     bool port_exists(int port) {
         lock_guard<mutex> _(port_mtx);
         return port_coords.find(port) != port_coords.end();
+    }
+
+    void restart_station(int port) {
+        lock_guard<mutex> _(port_mtx);
+        int old_pid = port_pid[port];
+        kill(old_pid, SIGKILL);
+        int new_pid = start_station(port);
+        pid_port.erase(old_pid);
+        pid_port[new_pid] = port;
+        port_pid[port] = new_pid;
+        for (auto port2 : stations.at(port)) {
+            StationClient(port).LinkStation(port2, get_cost(port, port2));
+        }
     }
 
     string rand_hex() {
@@ -401,7 +414,10 @@ class App final : public MainStation::Service {
             w.exec_params("update users set balance=$2 where id=$1", uid, user_balance);
             w.commit();
 
-            StationClient(station_id).AddMoney(amount, oil_id);
+            grpc::Status resp = StationClient(station_id).AddMoney(amount, oil_id);
+            if (!resp.ok() && resp.error_code() == grpc::StatusCode::DEADLINE_EXCEEDED) {
+                restart_station(station_id);
+            }
             return crow::response(crow::status::OK, "{\"data\":\"ok\"}");
         }
         catch (std::runtime_error&) {
@@ -531,6 +547,7 @@ class App final : public MainStation::Service {
             {
                 lock_guard<mutex> _(port_mtx);
                 pid_port[pid] = port;
+                port_pid[port] = pid;
                 port_coords[port] = {x, y};
             }
         }
@@ -599,6 +616,11 @@ class App final : public MainStation::Service {
         return grpc::Status::OK;
     }
 
+    grpc::Status Fail(ServerContext *, const FailRequest *req, None *) override {
+        restart_station(req->station_id());
+        return grpc::Status::OK;
+    }
+
     void healthcheck() {
         int status;
         pid_t wpid;
@@ -610,6 +632,7 @@ class App final : public MainStation::Service {
                 int new_pid = start_station(port);
                 pid_port.erase(wpid);
                 pid_port[new_pid] = port;
+                port_pid[port] = new_pid;
                 for (auto port2 : stations.at(port)) {
                     StationClient(port).LinkStation(port2, get_cost(port, port2));
                 }

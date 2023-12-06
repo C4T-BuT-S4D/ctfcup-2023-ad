@@ -182,7 +182,7 @@ function HomePage(prop: {stations: StationResponse}) {
 
   function _sendOil() {
     if (!ws) {
-      const wsClient = new WebSocket('ws://127.0.0.1:8087/ws/ws');
+      const wsClient = new WebSocket('ws://'+location.host+'/ws/ws');
       wsClient.onopen = () => {
         setSending(true);
         setWs(wsClient);

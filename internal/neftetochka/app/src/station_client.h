@@ -10,6 +10,14 @@ using grpc::Channel;
 using grpc::ClientContext;
 using namespace std;
 
+
+void set_deadline(ClientContext &context) {
+    chrono::system_clock::time_point deadline = 
+        chrono::system_clock::now() + chrono::seconds(5);
+    context.set_deadline(deadline);
+}
+
+
 class StationClient {
     private:
     unique_ptr<Station::Stub> stub_;
@@ -24,25 +32,28 @@ class StationClient {
         stub_ = Station::NewStub(channel);
     }
 
-    void InitStation(int port) {
+    grpc::Status InitStation(int port) {
         ClientContext context;
+        set_deadline(context);
         InitRequest req;
         None resp;
         req.set_port(port);        
-        stub_->Init(&context, req, &resp);
+        return stub_->Init(&context, req, &resp);
     }
 
-    void LinkStation(int port, int cost) {
+    grpc::Status LinkStation(int port, int cost) {
         ClientContext context;
+        set_deadline(context);
         LinkRequest req;
         None resp;
         req.set_port(port);
         req.set_cost(cost);
-        stub_->Link(&context, req, &resp);
+        return stub_->Link(&context, req, &resp);
     }
 
-    void SendOil(string uid, string receiver_id, string msg, int money, RepeatedField<int> &route) {
+    grpc::Status SendOil(string uid, string receiver_id, string msg, int money, RepeatedField<int> &route) {
         ClientContext context;
+        set_deadline(context);
         SendOilRequest req;
         None resp;
         req.set_uid(uid);
@@ -50,15 +61,16 @@ class StationClient {
         req.set_msg(msg);
         req.set_money(money);
         req.mutable_route()->Swap(&route);
-        stub_->SendOil(&context, req, &resp);
+        return stub_->SendOil(&context, req, &resp);
     }
 
-    void AddMoney(int amount, int oil_id) {
+    grpc::Status AddMoney(int amount, int oil_id) {
         ClientContext context;
+        set_deadline(context);
         AddMoneyRequest req;
         None resp;
         req.set_amount(amount);
         req.set_oil_id(oil_id);
-        stub_->AddMoney(&context, req, &resp);
+        return stub_->AddMoney(&context, req, &resp);
     }
 };

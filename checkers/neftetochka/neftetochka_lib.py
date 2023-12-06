@@ -65,8 +65,8 @@ class CheckMachine:
         self.c.assert_eq(type(resp), dict, "Invalid response on login", status)
         if resp.get("error", "") != "":
             self.c.cquit(status, "Error on login")
-        self.c.assert_eq(type(resp.get("id")), str, "Invalid response on register", status)
-        self.c.assert_eq(len(resp.get("id")), 0x20, "Invalid response on register", status)
+        self.c.assert_eq(type(resp.get("id")), str, "Invalid response on login", status)
+        self.c.assert_eq(len(resp.get("id")), 0x20, "Invalid response on login", status)
         return resp.get("id")
 
     def get_user(self, session: requests.Session, uid: str, status: Status) -> User:

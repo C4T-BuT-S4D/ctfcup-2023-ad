@@ -4,6 +4,7 @@ service MainStation {
     rpc Passed(PassedRequest) returns (None) {}
     rpc NoMoney(NoMoneyRequest) returns (None) {}
     rpc GetOil(GetOilRequest) returns (None) {}
+    rpc Fail(FailRequest) returns (None) {}
 }
 
 enum Status {
@@ -35,6 +36,10 @@ message GetOilRequest {
     string msg = 2;
     string receiver_id = 3;
     int64 station_id = 4;
+}
+
+message FailRequest {
+    int64 station_id = 1;
 }
 
 service Station {
