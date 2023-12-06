@@ -1,5 +1,6 @@
 checklib
-websocket-client==1.6.4
 grpcio
+pycryptodome
 protobuf
+websocket-client==1.6.4
 gpxpy
