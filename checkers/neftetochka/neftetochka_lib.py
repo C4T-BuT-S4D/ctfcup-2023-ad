@@ -54,10 +54,9 @@ class CheckMachine:
         self.c.assert_eq(type(resp), dict, "Invalid response on register", status)
         if resp.get("error", "") != "":
             self.c.cquit(status, "Error on register")
-        if resp.get("id", "") == "":
-            self.c.cquit(status, "Could not register")
-
-        return resp["id"]
+        self.c.assert_eq(type(resp.get("id")), str, "Invalid response on register", status)
+        self.c.assert_eq(len(resp.get("id")), 0x20, "Invalid response on register", status)
+        return resp.get("id")
 
     def login(self, session: requests.Session, username: str, password: str, status: Status) -> str:
         resp = session.post(f"{self.url}/login", json={"username": username, "password": password})
@@ -66,10 +65,9 @@ class CheckMachine:
         self.c.assert_eq(type(resp), dict, "Invalid response on login", status)
         if resp.get("error", "") != "":
             self.c.cquit(status, "Error on login")
-        if resp.get("id", "") == "":
-            self.c.cquit(status, "Could not login")
-
-        return resp["id"]
+        self.c.assert_eq(type(resp.get("id")), str, "Invalid response on register", status)
+        self.c.assert_eq(len(resp.get("id")), 0x20, "Invalid response on register", status)
+        return resp.get("id")
 
     def get_user(self, session: requests.Session, uid: str, status: Status) -> User:
         resp = session.post(f"{self.url}/user", json={"uid": uid})
