@@ -27,6 +27,12 @@ async def get_current_user(request: fastapi.Request) -> str:
             detail=json_error("Could not validate credentials"),
         )
 
+    if not user_data:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail=json_error("Could not validate credentials"),
+        )
+
     user_id = user_data.get('user_id')
     return user_id
 
@@ -87,6 +93,23 @@ async def signin_handler(response: fastapi.Response, auth_req: dto.AuthRequest):
     return {'user_id': f'{user.id}', 'api_token': token}
 
 
+@api.get('/user')
+async def get_user(user_id: str = fastapi.Depends(get_current_user)):
+    user = await models.User.get(user_id)
+    if not user:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail=json_error('user not found')
+        )
+    return serializers.UserSerializer.serialize(user)
+
+
+@api.post('/logout')
+def logout_handler(response: fastapi.Response):
+    response.delete_cookie("Api-Token")
+    return {'status': 'ok'}
+
+
 @api.post('/route/create')
 async def route_create_handler(create_req: dto.CreateRouteRequest, user_id: str = fastapi.Depends(get_current_user)):
     route = models.Route(title=create_req.title,
@@ -95,6 +118,12 @@ async def route_create_handler(create_req: dto.CreateRouteRequest, user_id: str 
     await route.insert()
 
     return serialize_route(route)
+
+
+@api.get('/route')
+async def route_list(user_id: str = fastapi.Depends(get_current_user)):
+    routes = await models.Route.find(models.Route.user_id == user_id).to_list()
+    return [serialize_route(route) for route in routes]
 
 
 @api.get('/route/{route_id}')

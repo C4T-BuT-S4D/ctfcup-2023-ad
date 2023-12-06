@@ -1,8 +1,17 @@
 services:
-  app:
-    build: .
+  proxy:
+    image: nginx:1.25-alpine
     ports:
       - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./conf/app.conf:/etc/nginx/conf.d/default.conf
+      - ./front/build:/front/build
+    depends_on:
+      - app
+
+  app:
+    build: .
     restart: unless-stopped
 
     cpus: 2

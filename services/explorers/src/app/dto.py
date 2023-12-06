@@ -8,6 +8,11 @@ class AuthRequest(BaseModel):
     password: str
 
 
+class User(BaseModel):
+    id: str
+    username: str
+
+
 class CreateRouteRequest(BaseModel):
     title: str
     description: str

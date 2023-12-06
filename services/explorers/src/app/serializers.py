@@ -2,6 +2,15 @@ from app import models
 from app import dto
 
 
+class UserSerializer:
+    @staticmethod
+    def serialize(user: models.User) -> dto.User:
+        return dto.User(
+            id=f'{user.id}',
+            username=user.username,
+        )
+
+
 class WaypointSerializer:
     @staticmethod
     def to_model(waypoint: dto.Waypoint) -> models.Waypoint:

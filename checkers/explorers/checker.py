@@ -66,6 +66,11 @@ class Checker(BaseChecker):
         self.assert_eq(route.get('title'), random_name, 'Failed to create route')
         self.assert_eq(route.get('description'), random_description, 'Failed to create route')
 
+        route_list = self.lib.get_route_list(session)
+        self.assert_eq(len(route_list), 1, 'Failed to get route list')
+        self.assert_eq(route_list[0].get('title'), random_name, 'Failed to get route list')
+        self.assert_eq(route_list[0].get('description'), random_description, 'Failed to get route list')
+
         wpts = [
             gpxhelper.WaypointParams(
                 name='Oil found',
@@ -167,6 +172,10 @@ class Checker(BaseChecker):
 
         route = self.lib.get_route(sess, route_id, status=Status.CORRUPT)
         self.assert_eq(route.get('description'), flag, 'Failed to get route', status=Status.CORRUPT)
+
+        route_list = self.lib.get_route_list(sess, status=Status.CORRUPT)
+        self.assert_in(flag, [x.get('description') for x in route_list], 'Failed to get route list',
+                       status=Status.CORRUPT)
 
         u, p = rnd_username(), rnd_password()
         new_sess = self.session_with_req_ua()
