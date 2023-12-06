@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* bg-gradient-to-br from-[#151515] to-[#440857] from-20% */
+
+/* :root {
+    background: linear-gradient(135deg, #151515 20%, #440857 100%);
+} */
+
+body {
+    background-color: #31063e
+}
