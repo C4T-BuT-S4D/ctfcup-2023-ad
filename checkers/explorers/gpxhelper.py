@@ -23,7 +23,9 @@ class TrackHelper:
         self.gpx_raw_files = []
         with open(os.path.join(os.path.dirname(__file__), 'gpx_ds_small.csv')) as f:
             reader = csv.reader(f)
-            for row in reader:
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
                 self.gpx_raw_files.append(row[0])
 
     def random_point(self) -> Point:
