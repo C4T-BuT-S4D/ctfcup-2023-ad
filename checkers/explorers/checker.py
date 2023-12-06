@@ -163,7 +163,7 @@ class Checker(BaseChecker):
         self.assert_eq(set(x.description for x in wpts), set(x.get('desc') for x in updated_gpx['waypoints']),
                        'Failed to upload gpx')
 
-        self.cquit(Status.OK, f"{u}:{p}:{route_id}")
+        self.cquit(Status.OK, route_id, f"{u}:{p}:{route_id}")
 
     def get(self, flag_id: str, flag: str, vuln: str):
         u, p, route_id = flag_id.split(':')
