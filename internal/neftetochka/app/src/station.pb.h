@@ -49,6 +49,9 @@ extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table
 class AddMoneyRequest;
 struct AddMoneyRequestDefaultTypeInternal;
 extern AddMoneyRequestDefaultTypeInternal _AddMoneyRequest_default_instance_;
+class FailRequest;
+struct FailRequestDefaultTypeInternal;
+extern FailRequestDefaultTypeInternal _FailRequest_default_instance_;
 class GetOilRequest;
 struct GetOilRequestDefaultTypeInternal;
 extern GetOilRequestDefaultTypeInternal _GetOilRequest_default_instance_;
@@ -72,6 +75,7 @@ struct SendOilRequestDefaultTypeInternal;
 extern SendOilRequestDefaultTypeInternal _SendOilRequest_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::AddMoneyRequest* Arena::CreateMaybeMessage<::AddMoneyRequest>(Arena*);
+template<> ::FailRequest* Arena::CreateMaybeMessage<::FailRequest>(Arena*);
 template<> ::GetOilRequest* Arena::CreateMaybeMessage<::GetOilRequest>(Arena*);
 template<> ::InitRequest* Arena::CreateMaybeMessage<::InitRequest>(Arena*);
 template<> ::LinkRequest* Arena::CreateMaybeMessage<::LinkRequest>(Arena*);
@@ -701,6 +705,154 @@ class GetOilRequest final :
 };
 // -------------------------------------------------------------------
 
+class FailRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:FailRequest) */ {
+ public:
+  inline FailRequest() : FailRequest(nullptr) {}
+  ~FailRequest() override;
+  explicit PROTOBUF_CONSTEXPR FailRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  FailRequest(const FailRequest& from);
+  FailRequest(FailRequest&& from) noexcept
+    : FailRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline FailRequest& operator=(const FailRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline FailRequest& operator=(FailRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const FailRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const FailRequest* internal_default_instance() {
+    return reinterpret_cast<const FailRequest*>(
+               &_FailRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(FailRequest& a, FailRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(FailRequest* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(FailRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  FailRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<FailRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const FailRequest& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const FailRequest& from) {
+    FailRequest::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(FailRequest* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "FailRequest";
+  }
+  protected:
+  explicit FailRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kStationIdFieldNumber = 1,
+  };
+  // int64 station_id = 1;
+  void clear_station_id();
+  int64_t station_id() const;
+  void set_station_id(int64_t value);
+  private:
+  int64_t _internal_station_id() const;
+  void _internal_set_station_id(int64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:FailRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    int64_t station_id_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_station_2eproto;
+};
+// -------------------------------------------------------------------
+
 class InitRequest final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:InitRequest) */ {
  public:
@@ -749,7 +901,7 @@ class InitRequest final :
                &_InitRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(InitRequest& a, InitRequest& b) {
     a.Swap(&b);
@@ -897,7 +1049,7 @@ class LinkRequest final :
                &_LinkRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(LinkRequest& a, LinkRequest& b) {
     a.Swap(&b);
@@ -1056,7 +1208,7 @@ class SendOilRequest final :
                &_SendOilRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(SendOilRequest& a, SendOilRequest& b) {
     a.Swap(&b);
@@ -1277,7 +1429,7 @@ class AddMoneyRequest final :
                &_AddMoneyRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(AddMoneyRequest& a, AddMoneyRequest& b) {
     a.Swap(&b);
@@ -1435,7 +1587,7 @@ class None final :
                &_None_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(None& a, None& b) {
     a.Swap(&b);
@@ -1995,6 +2147,30 @@ inline void GetOilRequest::set_station_id(int64_t value) {
 
 // -------------------------------------------------------------------
 
+// FailRequest
+
+// int64 station_id = 1;
+inline void FailRequest::clear_station_id() {
+  _impl_.station_id_ = int64_t{0};
+}
+inline int64_t FailRequest::_internal_station_id() const {
+  return _impl_.station_id_;
+}
+inline int64_t FailRequest::station_id() const {
+  // @@protoc_insertion_point(field_get:FailRequest.station_id)
+  return _internal_station_id();
+}
+inline void FailRequest::_internal_set_station_id(int64_t value) {
+  
+  _impl_.station_id_ = value;
+}
+inline void FailRequest::set_station_id(int64_t value) {
+  _internal_set_station_id(value);
+  // @@protoc_insertion_point(field_set:FailRequest.station_id)
+}
+
+// -------------------------------------------------------------------
+
 // InitRequest
 
 // int32 port = 1;
@@ -2333,6 +2509,8 @@ inline void AddMoneyRequest::set_oil_id(int32_t value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

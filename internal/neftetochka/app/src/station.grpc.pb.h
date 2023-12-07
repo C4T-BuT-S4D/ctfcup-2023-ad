@@ -54,6 +54,13 @@ class MainStation final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> PrepareAsyncGetOil(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(PrepareAsyncGetOilRaw(context, request, cq));
     }
+    virtual ::grpc::Status Fail(::grpc::ClientContext* context, const ::FailRequest& request, ::None* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> AsyncFail(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(AsyncFailRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>> PrepareAsyncFail(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::None>>(PrepareAsyncFailRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -63,6 +70,8 @@ class MainStation final {
       virtual void NoMoney(::grpc::ClientContext* context, const ::NoMoneyRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void GetOil(::grpc::ClientContext* context, const ::GetOilRequest* request, ::None* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetOil(::grpc::ClientContext* context, const ::GetOilRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -74,6 +83,8 @@ class MainStation final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* PrepareAsyncNoMoneyRaw(::grpc::ClientContext* context, const ::NoMoneyRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* AsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* PrepareAsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* AsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::None>* PrepareAsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -99,6 +110,13 @@ class MainStation final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> PrepareAsyncGetOil(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(PrepareAsyncGetOilRaw(context, request, cq));
     }
+    ::grpc::Status Fail(::grpc::ClientContext* context, const ::FailRequest& request, ::None* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> AsyncFail(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(AsyncFailRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>> PrepareAsyncFail(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::None>>(PrepareAsyncFailRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -108,6 +126,8 @@ class MainStation final {
       void NoMoney(::grpc::ClientContext* context, const ::NoMoneyRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) override;
       void GetOil(::grpc::ClientContext* context, const ::GetOilRequest* request, ::None* response, std::function<void(::grpc::Status)>) override;
       void GetOil(::grpc::ClientContext* context, const ::GetOilRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, std::function<void(::grpc::Status)>) override;
+      void Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -125,9 +145,12 @@ class MainStation final {
     ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncNoMoneyRaw(::grpc::ClientContext* context, const ::NoMoneyRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* AsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncGetOilRaw(::grpc::ClientContext* context, const ::GetOilRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::None>* AsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::None>* PrepareAsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_Passed_;
     const ::grpc::internal::RpcMethod rpcmethod_NoMoney_;
     const ::grpc::internal::RpcMethod rpcmethod_GetOil_;
+    const ::grpc::internal::RpcMethod rpcmethod_Fail_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -138,6 +161,7 @@ class MainStation final {
     virtual ::grpc::Status Passed(::grpc::ServerContext* context, const ::PassedRequest* request, ::None* response);
     virtual ::grpc::Status NoMoney(::grpc::ServerContext* context, const ::NoMoneyRequest* request, ::None* response);
     virtual ::grpc::Status GetOil(::grpc::ServerContext* context, const ::GetOilRequest* request, ::None* response);
+    virtual ::grpc::Status Fail(::grpc::ServerContext* context, const ::FailRequest* request, ::None* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_Passed : public BaseClass {
@@ -199,7 +223,27 @@ class MainStation final {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_Passed<WithAsyncMethod_NoMoney<WithAsyncMethod_GetOil<Service > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_Fail() {
+      ::grpc::Service::MarkMethodAsync(3);
+    }
+    ~WithAsyncMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFail(::grpc::ServerContext* context, ::FailRequest* request, ::grpc::ServerAsyncResponseWriter< ::None>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_Passed<WithAsyncMethod_NoMoney<WithAsyncMethod_GetOil<WithAsyncMethod_Fail<Service > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_Passed : public BaseClass {
    private:
@@ -281,7 +325,34 @@ class MainStation final {
     virtual ::grpc::ServerUnaryReactor* GetOil(
       ::grpc::CallbackServerContext* /*context*/, const ::GetOilRequest* /*request*/, ::None* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_Passed<WithCallbackMethod_NoMoney<WithCallbackMethod_GetOil<Service > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Fail() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::FailRequest, ::None>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::FailRequest* request, ::None* response) { return this->Fail(context, request, response); }));}
+    void SetMessageAllocatorFor_Fail(
+        ::grpc::MessageAllocator< ::FailRequest, ::None>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::FailRequest, ::None>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Fail(
+      ::grpc::CallbackServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_Passed<WithCallbackMethod_NoMoney<WithCallbackMethod_GetOil<WithCallbackMethod_Fail<Service > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_Passed : public BaseClass {
@@ -330,6 +401,23 @@ class MainStation final {
     }
     // disable synchronous version of this method
     ::grpc::Status GetOil(::grpc::ServerContext* /*context*/, const ::GetOilRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_Fail() {
+      ::grpc::Service::MarkMethodGeneric(3);
+    }
+    ~WithGenericMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -392,6 +480,26 @@ class MainStation final {
     }
     void RequestGetOil(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_Fail() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFail(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -458,6 +566,28 @@ class MainStation final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* GetOil(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Fail() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Fail(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Fail(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -541,9 +671,36 @@ class MainStation final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGetOil(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::GetOilRequest,::None>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_Fail : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_Fail() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::FailRequest, ::None>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::FailRequest, ::None>* streamer) {
+                       return this->StreamedFail(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_Fail() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status Fail(::grpc::ServerContext* /*context*/, const ::FailRequest* /*request*/, ::None* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedFail(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::FailRequest,::None>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<WithStreamedUnaryMethod_Fail<Service > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<Service > > > StreamedService;
+  typedef WithStreamedUnaryMethod_Passed<WithStreamedUnaryMethod_NoMoney<WithStreamedUnaryMethod_GetOil<WithStreamedUnaryMethod_Fail<Service > > > > StreamedService;
 };
 
 class Station final {

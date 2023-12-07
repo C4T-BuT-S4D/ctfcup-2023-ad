@@ -69,6 +69,19 @@ struct GetOilRequestDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 GetOilRequestDefaultTypeInternal _GetOilRequest_default_instance_;
+PROTOBUF_CONSTEXPR FailRequest::FailRequest(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.station_id_)*/int64_t{0}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct FailRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR FailRequestDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~FailRequestDefaultTypeInternal() {}
+  union {
+    FailRequest _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FailRequestDefaultTypeInternal _FailRequest_default_instance_;
 PROTOBUF_CONSTEXPR InitRequest::InitRequest(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.port_)*/0
@@ -139,7 +152,7 @@ struct NoneDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 NoneDefaultTypeInternal _None_default_instance_;
-static ::_pb::Metadata file_level_metadata_station_2eproto[8];
+static ::_pb::Metadata file_level_metadata_station_2eproto[9];
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_station_2eproto[1];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_station_2eproto = nullptr;
 
@@ -175,6 +188,13 @@ const uint32_t TableStruct_station_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.msg_),
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.receiver_id_),
   PROTOBUF_FIELD_OFFSET(::GetOilRequest, _impl_.station_id_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::FailRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::FailRequest, _impl_.station_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::InitRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -220,17 +240,19 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 0, -1, -1, sizeof(::PassedRequest)},
   { 10, -1, -1, sizeof(::NoMoneyRequest)},
   { 21, -1, -1, sizeof(::GetOilRequest)},
-  { 31, -1, -1, sizeof(::InitRequest)},
-  { 38, -1, -1, sizeof(::LinkRequest)},
-  { 46, -1, -1, sizeof(::SendOilRequest)},
-  { 57, -1, -1, sizeof(::AddMoneyRequest)},
-  { 65, -1, -1, sizeof(::None)},
+  { 31, -1, -1, sizeof(::FailRequest)},
+  { 38, -1, -1, sizeof(::InitRequest)},
+  { 45, -1, -1, sizeof(::LinkRequest)},
+  { 53, -1, -1, sizeof(::SendOilRequest)},
+  { 64, -1, -1, sizeof(::AddMoneyRequest)},
+  { 72, -1, -1, sizeof(::None)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
   &::_PassedRequest_default_instance_._instance,
   &::_NoMoneyRequest_default_instance_._instance,
   &::_GetOilRequest_default_instance_._instance,
+  &::_FailRequest_default_instance_._instance,
   &::_InitRequest_default_instance_._instance,
   &::_LinkRequest_default_instance_._instance,
   &::_SendOilRequest_default_instance_._instance,
@@ -246,28 +268,29 @@ const char descriptor_table_protodef_station_2eproto[] PROTOBUF_SECTION_VARIABLE
   "tion_id\030\003 \001(\003\022\016\n\006oil_id\030\004 \001(\003\022\r\n\005money\030\005"
   " \001(\003\"R\n\rGetOilRequest\022\013\n\003uid\030\001 \001(\t\022\013\n\003ms"
   "g\030\002 \001(\t\022\023\n\013receiver_id\030\003 \001(\t\022\022\n\nstation_"
-  "id\030\004 \001(\003\"\033\n\013InitRequest\022\014\n\004port\030\001 \001(\005\")\n"
-  "\013LinkRequest\022\014\n\004port\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005"
-  "\"]\n\016SendOilRequest\022\013\n\003uid\030\001 \001(\t\022\023\n\013recei"
-  "ver_id\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\022\r\n\005money\030\004 \001(\003"
-  "\022\r\n\005route\030\005 \003(\005\"1\n\017AddMoneyRequest\022\016\n\006am"
-  "ount\030\002 \001(\005\022\016\n\006oil_id\030\003 \001(\005\"\006\n\004None*_\n\006St"
-  "atus\022\026\n\022STATUS_UNSPECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010"
-  "NO_MONEY\020\002\022\010\n\004PASS\020\003\022\t\n\005READY\020\004\022\022\n\016INVAL"
-  "ID_OIL_ID\020\0052x\n\013MainStation\022!\n\006Passed\022\016.P"
-  "assedRequest\032\005.None\"\000\022#\n\007NoMoney\022\017.NoMon"
-  "eyRequest\032\005.None\"\000\022!\n\006GetOil\022\016.GetOilReq"
-  "uest\032\005.None\"\0002\223\001\n\007Station\022\035\n\004Init\022\014.Init"
-  "Request\032\005.None\"\000\022\035\n\004Link\022\014.LinkRequest\032\005"
-  ".None\"\000\022#\n\007SendOil\022\017.SendOilRequest\032\005.No"
-  "ne\"\000\022%\n\010AddMoney\022\020.AddMoneyRequest\032\005.Non"
-  "e\"\000b\006proto3"
+  "id\030\004 \001(\003\"!\n\013FailRequest\022\022\n\nstation_id\030\001 "
+  "\001(\003\"\033\n\013InitRequest\022\014\n\004port\030\001 \001(\005\")\n\013Link"
+  "Request\022\014\n\004port\030\001 \001(\005\022\014\n\004cost\030\002 \001(\005\"]\n\016S"
+  "endOilRequest\022\013\n\003uid\030\001 \001(\t\022\023\n\013receiver_i"
+  "d\030\002 \001(\t\022\013\n\003msg\030\003 \001(\t\022\r\n\005money\030\004 \001(\003\022\r\n\005r"
+  "oute\030\005 \003(\005\"1\n\017AddMoneyRequest\022\016\n\006amount\030"
+  "\002 \001(\005\022\016\n\006oil_id\030\003 \001(\005\"\006\n\004None*_\n\006Status\022"
+  "\026\n\022STATUS_UNSPECIFIED\020\000\022\006\n\002OK\020\001\022\014\n\010NO_MO"
+  "NEY\020\002\022\010\n\004PASS\020\003\022\t\n\005READY\020\004\022\022\n\016INVALID_OI"
+  "L_ID\020\0052\227\001\n\013MainStation\022!\n\006Passed\022\016.Passe"
+  "dRequest\032\005.None\"\000\022#\n\007NoMoney\022\017.NoMoneyRe"
+  "quest\032\005.None\"\000\022!\n\006GetOil\022\016.GetOilRequest"
+  "\032\005.None\"\000\022\035\n\004Fail\022\014.FailRequest\032\005.None\"\000"
+  "2\223\001\n\007Station\022\035\n\004Init\022\014.InitRequest\032\005.Non"
+  "e\"\000\022\035\n\004Link\022\014.LinkRequest\032\005.None\"\000\022#\n\007Se"
+  "ndOil\022\017.SendOilRequest\032\005.None\"\000\022%\n\010AddMo"
+  "ney\022\020.AddMoneyRequest\032\005.None\"\000b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_station_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_station_2eproto = {
-    false, false, 891, descriptor_table_protodef_station_2eproto,
+    false, false, 958, descriptor_table_protodef_station_2eproto,
     "station.proto",
-    &descriptor_table_station_2eproto_once, nullptr, 0, 8,
+    &descriptor_table_station_2eproto_once, nullptr, 0, 9,
     schemas, file_default_instances, TableStruct_station_2eproto::offsets,
     file_level_metadata_station_2eproto, file_level_enum_descriptors_station_2eproto,
     file_level_service_descriptors_station_2eproto,
@@ -1279,6 +1302,184 @@ void GetOilRequest::InternalSwap(GetOilRequest* other) {
 
 // ===================================================================
 
+class FailRequest::_Internal {
+ public:
+};
+
+FailRequest::FailRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:FailRequest)
+}
+FailRequest::FailRequest(const FailRequest& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  FailRequest* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.station_id_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_impl_.station_id_ = from._impl_.station_id_;
+  // @@protoc_insertion_point(copy_constructor:FailRequest)
+}
+
+inline void FailRequest::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.station_id_){int64_t{0}}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+FailRequest::~FailRequest() {
+  // @@protoc_insertion_point(destructor:FailRequest)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void FailRequest::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void FailRequest::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void FailRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:FailRequest)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.station_id_ = int64_t{0};
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* FailRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int64 station_id = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.station_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* FailRequest::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:FailRequest)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int64 station_id = 1;
+  if (this->_internal_station_id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(1, this->_internal_station_id(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:FailRequest)
+  return target;
+}
+
+size_t FailRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:FailRequest)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int64 station_id = 1;
+  if (this->_internal_station_id() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_station_id());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData FailRequest::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    FailRequest::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*FailRequest::GetClassData() const { return &_class_data_; }
+
+
+void FailRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<FailRequest*>(&to_msg);
+  auto& from = static_cast<const FailRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:FailRequest)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_station_id() != 0) {
+    _this->_internal_set_station_id(from._internal_station_id());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void FailRequest::CopyFrom(const FailRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:FailRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool FailRequest::IsInitialized() const {
+  return true;
+}
+
+void FailRequest::InternalSwap(FailRequest* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.station_id_, other->_impl_.station_id_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata FailRequest::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
+      file_level_metadata_station_2eproto[3]);
+}
+
+// ===================================================================
+
 class InitRequest::_Internal {
  public:
 };
@@ -1452,7 +1653,7 @@ void InitRequest::InternalSwap(InitRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata InitRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[3]);
+      file_level_metadata_station_2eproto[4]);
 }
 
 // ===================================================================
@@ -1663,7 +1864,7 @@ void LinkRequest::InternalSwap(LinkRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LinkRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[4]);
+      file_level_metadata_station_2eproto[5]);
 }
 
 // ===================================================================
@@ -2035,7 +2236,7 @@ void SendOilRequest::InternalSwap(SendOilRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SendOilRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[5]);
+      file_level_metadata_station_2eproto[6]);
 }
 
 // ===================================================================
@@ -2246,7 +2447,7 @@ void AddMoneyRequest::InternalSwap(AddMoneyRequest* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata AddMoneyRequest::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[6]);
+      file_level_metadata_station_2eproto[7]);
 }
 
 // ===================================================================
@@ -2286,7 +2487,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*None::GetClassData() const { r
 ::PROTOBUF_NAMESPACE_ID::Metadata None::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_station_2eproto_getter, &descriptor_table_station_2eproto_once,
-      file_level_metadata_station_2eproto[7]);
+      file_level_metadata_station_2eproto[8]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -2302,6 +2503,10 @@ Arena::CreateMaybeMessage< ::NoMoneyRequest >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::GetOilRequest*
 Arena::CreateMaybeMessage< ::GetOilRequest >(Arena* arena) {
   return Arena::CreateMessageInternal< ::GetOilRequest >(arena);
+}
+template<> PROTOBUF_NOINLINE ::FailRequest*
+Arena::CreateMaybeMessage< ::FailRequest >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::FailRequest >(arena);
 }
 template<> PROTOBUF_NOINLINE ::InitRequest*
 Arena::CreateMaybeMessage< ::InitRequest >(Arena* arena) {

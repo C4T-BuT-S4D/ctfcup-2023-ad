@@ -24,6 +24,7 @@ static const char* MainStation_method_names[] = {
   "/MainStation/Passed",
   "/MainStation/NoMoney",
   "/MainStation/GetOil",
+  "/MainStation/Fail",
 };
 
 std::unique_ptr< MainStation::Stub> MainStation::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -36,6 +37,7 @@ MainStation::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channe
   : channel_(channel), rpcmethod_Passed_(MainStation_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_NoMoney_(MainStation_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetOil_(MainStation_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Fail_(MainStation_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status MainStation::Stub::Passed(::grpc::ClientContext* context, const ::PassedRequest& request, ::None* response) {
@@ -107,6 +109,29 @@ void MainStation::Stub::async::GetOil(::grpc::ClientContext* context, const ::Ge
   return result;
 }
 
+::grpc::Status MainStation::Stub::Fail(::grpc::ClientContext* context, const ::FailRequest& request, ::None* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::FailRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Fail_, context, request, response);
+}
+
+void MainStation::Stub::async::Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::FailRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Fail_, context, request, response, std::move(f));
+}
+
+void MainStation::Stub::async::Fail(::grpc::ClientContext* context, const ::FailRequest* request, ::None* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Fail_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::None>* MainStation::Stub::PrepareAsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::None, ::FailRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Fail_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::None>* MainStation::Stub::AsyncFailRaw(::grpc::ClientContext* context, const ::FailRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncFailRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 MainStation::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       MainStation_method_names[0],
@@ -138,6 +163,16 @@ MainStation::Service::Service() {
              ::None* resp) {
                return service->GetOil(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      MainStation_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< MainStation::Service, ::FailRequest, ::None, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](MainStation::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::FailRequest* req,
+             ::None* resp) {
+               return service->Fail(ctx, req, resp);
+             }, this)));
 }
 
 MainStation::Service::~Service() {
@@ -158,6 +193,13 @@ MainStation::Service::~Service() {
 }
 
 ::grpc::Status MainStation::Service::GetOil(::grpc::ServerContext* context, const ::GetOilRequest* request, ::None* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status MainStation::Service::Fail(::grpc::ServerContext* context, const ::FailRequest* request, ::None* response) {
   (void) context;
   (void) request;
   (void) response;

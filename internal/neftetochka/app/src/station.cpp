@@ -21,11 +21,10 @@ using namespace std;
 #define MAX_SIZE 1000
 
 struct Oil {
-    string uid;
-    RepeatedField<int> route;
+    string uid, receiver_id;
     long long money = 0;
-    string receiver_id;
-    string msg;
+    RepeatedField<int> route;
+    string  msg;
 
     Oil() {}
     Oil(long long _money, string _uid, string _receiver_id, string _msg, RepeatedField<int> _route) {
@@ -38,13 +37,14 @@ struct Oil {
 };
 
 mutex no_money_mtx; // mutex for `no_money`, `used`, `next_oil_id`
-Oil no_money[MAX_SIZE];
-int used[MAX_SIZE] = {};
-int next_oil_id = 0;
-
 mutex port_mtx;     // mutex for `port`, `port_cost`
+
 int port = 0;
 map<int, int> port_cost;
+
+int used[MAX_SIZE] = {};
+Oil no_money[MAX_SIZE];
+int next_oil_id = 0;
 
 
 class MainStationClient {
@@ -68,6 +68,7 @@ class MainStationClient {
         req.set_station_id(port);
         req.set_money(money);
         }
+        set_deadline(context);
         stub_->Passed(&context, req, &resp);
     }
 
@@ -83,6 +84,7 @@ class MainStationClient {
         req.set_oil_id(oil_id);
         req.set_money(money);
         }
+        set_deadline(context);
         stub_->NoMoney(&context, req, &resp);
     }
 
@@ -97,7 +99,17 @@ class MainStationClient {
         req.set_receiver_id(receiver_id);
         req.set_station_id(port);
         }
+        set_deadline(context);
         stub_->GetOil(&context, req, &resp);
+    }
+
+    void Fail(int station_id) {
+        ClientContext context;
+        FailRequest req;
+        None resp;
+        req.set_station_id(station_id);
+        set_deadline(context);
+        stub_->Fail(&context, req, &resp);
     }
 };
 
@@ -121,7 +133,10 @@ class StationImpl final : public Station::Service {
         else if (oil.route.size() > 1) {
             int next = oil.route[oil.route.size() - 2];
             main_client.Passed(oil.uid, oil.receiver_id, oil.money);
-            StationClient(next).SendOil(oil.uid, oil.receiver_id, oil.msg, oil.money, oil.route);
+            grpc::Status resp = StationClient(next).SendOil(oil.uid, oil.receiver_id, oil.msg, oil.money, oil.route);
+            if (!resp.ok() && resp.error_code() == grpc::StatusCode::DEADLINE_EXCEEDED) {
+                main_client.Fail(next);
+            }
             return;
         }
         else {
