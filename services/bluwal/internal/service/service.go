@@ -109,6 +109,8 @@ func (s *Service) ContestList(_ context.Context, request *bwpb.ContestListReques
 
 	contestsProto := make([]*bwpb.Contest, 0, len(contests))
 	for _, contest := range contests {
+		contest.Author = ""
+		contest.Reward = ""
 		contestProto, err := contest.ToProto()
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "converting contest to proto: %v", err)
