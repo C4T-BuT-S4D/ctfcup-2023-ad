@@ -1,0 +1,106 @@
+game:
+  mode: classic
+  round_time: 60
+  start_time: 2023-12-08 10:00:00
+  timezone: Europe/Moscow
+  default_score: 2500
+  flag_lifetime: 10
+  game_hardness: 15.0
+  inflation: true
+
+tasks:
+- checker: oilmarket/checker.py
+  checker_timeout: 15
+  checker_type: gevent_pfr
+  gets: 1
+  name: oilmarket
+  places: 1
+  puts: 1
+- checker: neftetochka/checker.py
+  checker_timeout: 10
+  checker_type: gevent
+  gets: 1
+  name: neftetochka
+  places: 1
+  puts: 1
+- checker: explorers/checker.py
+  checker_timeout: 15
+  checker_type: gevent_pfr
+  gets: 1
+  name: explorers
+  places: 1
+  puts: 1
+- checker: bluwal/checker.py
+  checker_timeout: 10
+  checker_type: gevent_pfr
+  gets: 1
+  name: bluwal
+  places: 1
+  puts: 1
+
+
+teams:
+- ip: 10.80.0.2
+  name: NPC
+  highlighted: false
+- ip: 10.80.1.2
+  name: UzUzuga
+  highlighted: false
+- ip: 10.80.2.2
+  name: CyberKTITS
+  highlighted: false
+- ip: 10.80.3.2
+  name: RedHazzarTeam
+  highlighted: false
+- ip: 10.80.4.2
+  name: FR13NDS TEAM
+  highlighted: false
+- ip: 10.80.5.2
+  name: '[Madoka] CTFLovers'
+  highlighted: false
+- ip: 10.80.6.2
+  name: Drovosec
+  highlighted: false
+- ip: 10.80.7.2
+  name: PurpleGenesis
+  highlighted: false
+- ip: 10.80.8.2
+  name: Little computer demons
+  highlighted: false
+- ip: 10.80.9.2
+  name: cR4.sh
+  highlighted: false
+- ip: 10.80.10.2
+  name: dtl
+  highlighted: false
+- ip: 10.80.11.2
+  name: Red Cadets
+  highlighted: false
+- ip: 10.80.12.2
+  name: smiley-from-telega
+  highlighted: false
+- ip: 10.80.13.2
+  name: qual3nc3
+  highlighted: false
+- ip: 10.80.14.2
+  name: SPRUSH
+  highlighted: false
+- ip: 10.80.15.2
+  name: DD0st4r
+  highlighted: false
+- ip: 10.80.16.2
+  name: FaKappa
+  highlighted: false
+- ip: 10.80.17.2
+  name: l33t1m
+  highlighted: false
+- ip: 10.80.18.2
+  name: SIGAN
+  highlighted: false
+- ip: 10.80.19.2
+  name: '[MIEM] N_K_N'
+  highlighted: false
+- ip: 10.80.20.2
+  name: N0Name13
+  highlighted: false
+
