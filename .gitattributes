@@ -1,5 +1,12 @@
 checkers/bluwal/proto/** linguist-vendored
-sploits/bluwal/proto/** linguist-vendored
-services/bluwal/proto/python/** linguist-vendored
+checkers/oilmarket/oilmarket_pb2*
+
+internal/neftetochka/app/inc/**
+internal/neftetochka/app/src/station.grpc.*
+internal/neftetochka/app/src/station.pb.*
+
 services/bluwal/pkg/proto/** linguist-vendored
+services/bluwal/proto/python/** linguist-vendored
 services/bluwal/front/src/proto/** linguist-vendored
+
+sploits/bluwal/proto/** linguist-vendored
